@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import User from "@/models/userModel";
+import User from "@/models/consumerModel";
 import bcryptjs from "bcryptjs";
 import nodemailer from "nodemailer";
 
