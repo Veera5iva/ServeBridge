@@ -20,6 +20,12 @@ const providerSchema = new mongoose.Schema(
       required: [true, "Please provide a password"],
       minlength: [6, "Password must be at least 6 characters long"],
     },
+    role: {
+      type: String,
+      required: true,
+      enum: ["provider"], // Ensure only "provider" role is allowed
+      default: "provider", // Automatically assign "provider" role during signup
+    },
     serviceType: {
       type: String,
       required: [true, "Please provide a service type"], // Example: plumber, electrician

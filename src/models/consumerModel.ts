@@ -21,9 +21,10 @@ const consumerSchema = new mongoose.Schema({
    },
    role: {
       type: String,
-      enum: ["consumer", "provider", "admin"],
-      default: "consumer"
-   },
+      required: true,
+      enum: ["consumer"], // Ensure only "provider" role is allowed
+      default: "consumer", // Automatically assign "provider" role during signup
+    },
    location: {
       type: {
          type: String,
