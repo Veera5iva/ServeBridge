@@ -46,10 +46,6 @@ const consumerSchema = new mongoose.Schema({
          required: false,
          match: [/^\d{10}$/, "Please provide a valid phone number"]
       },
-      bio: {
-         type: String,
-         maxlength: 500 // Limit the bio length
-      }
    },
    forgotPasswordToken: String,
    forgotPasswordTokenExpiry: Date,
