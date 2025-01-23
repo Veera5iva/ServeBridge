@@ -24,7 +24,7 @@ const serviceSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-});
+}, { timestamps: true });
 
 
 const Service = mongoose.models.Service || mongoose.model('Service', serviceSchema);
