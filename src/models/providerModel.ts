@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 
-const providerSchema = new mongoose.Schema(
-  {
+const providerSchema = new mongoose.Schema({
     username: {
       type: String,
       required: [true, "Please provide a username"],
@@ -28,17 +27,17 @@ const providerSchema = new mongoose.Schema(
     role: {
       type: String,
       required: true,
-      enum: ["provider"], // Ensure only "provider" role is allowed
-      default: "provider", // Automatically assign "provider" role during signup
+      enum: ["provider"], 
+      default: "provider", 
     },
     serviceType: {
       type: String,
-      required: [true, "Please provide a service type"], // Example: plumber, electrician
+      required: [true, "Please provide a service type"], 
       trim: true,
     },
     description: {
       type: String,
-      maxlength: 1000, // Limit the description length
+      maxlength: 1000, 
     },
     location: {
       type: {
@@ -47,7 +46,7 @@ const providerSchema = new mongoose.Schema(
         default: "Point",
       },
       coordinates: {
-        type: [Number], // [longitude, latitude]
+        type: [Number], 
         required: false,
       },
     },
@@ -59,9 +58,7 @@ const providerSchema = new mongoose.Schema(
     forgotPasswordTokenExpiry: Date,
     verifyToken: String,
     verifyTokenExpiry: Date,
-  },
-  { timestamps: true }
-);
+  }, { timestamps: true });
 
 const Provider = mongoose.models.providers || mongoose.model("Provider", providerSchema);
 

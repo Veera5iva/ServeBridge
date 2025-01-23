@@ -27,8 +27,8 @@ const consumerSchema = new mongoose.Schema({
    role: {
       type: String,
       required: true,
-      enum: ["consumer"], // Ensure only "provider" role is allowed
-      default: "consumer", // Automatically assign "provider" role during signup
+      enum: ["consumer"], 
+      default: "consumer", 
     },
    location: {
       type: {
@@ -37,7 +37,7 @@ const consumerSchema = new mongoose.Schema({
          default: "Point"
       },
       coordinates: {
-         type: [Number], // [longitude, latitude]
+         type: [Number], 
          required: false
       }
    },
