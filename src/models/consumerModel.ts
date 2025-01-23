@@ -6,6 +6,11 @@ const consumerSchema = new mongoose.Schema({
       required: [true, "Please provide a username"],
       trim: true,
    },
+   phone: {
+      type: String,
+      required: false,
+      match: [/^\d{10}$/, "Please provide a valid phone number"]
+   },
    email: {
       type: String,
       required: [true, "Please provide an email"],
@@ -39,13 +44,6 @@ const consumerSchema = new mongoose.Schema({
    isVerified: {
       type: Boolean,
       default: false
-   },
-   profile: {
-      phone: {
-         type: String,
-         required: false,
-         match: [/^\d{10}$/, "Please provide a valid phone number"]
-      },
    },
    forgotPasswordToken: String,
    forgotPasswordTokenExpiry: Date,
