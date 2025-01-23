@@ -25,11 +25,22 @@ export default function LoginPage() {
    const onLogin = async () => {
       try {
          setLoading(true);
-         const response = await axios.post("/api/users/login", user)
-         console.log("User logged in successfully", response.data);
-         toast.success("Login success");
-         router.push("/profile")
-         
+         const response = await axios.post('/api/users/login', user);
+
+         if (response.data.success) {
+            const token = response.data.token;
+            console.log("Received token: ", token);
+
+            // Store the token in localStorage
+            localStorage.setItem("token", token);
+
+            const role = response.data.role;
+            if (role === "consumer") {
+               router.push("/consumer-dashboard");
+            } else if (role === "provider") {
+               router.push("/provider-dashboard");
+            }
+         }
       } catch (error) {
          if(error instanceof Error) return toast.error(error.message);
          console.log("Login error occured", error);
@@ -43,7 +54,13 @@ export default function LoginPage() {
    return (
       <div className="flex flex-col items-center justify-center py-2 min-h-screen gap-y-1">
          <Toaster position="top-right" reverseOrder={false}/>
-         <h1 className="text-3xl text-center">{loading ? "Processing" : "Login page"}</h1>
+         <h1 className="text-3xl text-center">
+            {loading ? (
+               <div className="spinner">Loading...</div> 
+            ) : (
+               <h1 className="text-3xl text-center">Login page</h1>
+            )}
+         </h1>
          <label htmlFor="email">email</label>
          <hr className="h-2" />
          <input

@@ -1,8 +1,9 @@
 import {connect} from "@/dbConfig/dbConfig"
-import User from "@/models/consumerModel"
+import { Consumer, Provider } from "@/models"
 import { NextRequest, NextResponse } from "next/server"
 import bcryptjs from "bcryptjs"
 import jwt from "jsonwebtoken"
+
 
 connect()
 
@@ -13,7 +14,13 @@ export async function POST(request: NextRequest) {
       const {email, password} = reqBody
       console.log(reqBody);
 
-      const user = await User.findOne({email})
+      let user = await Consumer.findOne({email})
+      let role = "consumer";
+
+      if(!user) {
+         user = await Provider.findOne({email});
+         role = "provider";
+      } 
       if(!user) return NextResponse.json({error: "User not found"}, {status: 400});
 
       // check if password is correct
@@ -25,6 +32,7 @@ export async function POST(request: NextRequest) {
          id: user._id,
          username: user.username,
          email: user.email,
+         role
       }
 
       // create token
@@ -32,7 +40,9 @@ export async function POST(request: NextRequest) {
 
       const response = NextResponse.json({
          message: "Login successful",
-         success: true
+         success: true,
+         token,
+         role
       })
 
       // set cookies  
