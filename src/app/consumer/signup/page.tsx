@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
-import PasswordInput from "@/components/PasswordInput"; // Import the PasswordInput component
+import PasswordInput from "@/components/PasswordInput"; 
 
 export default function SignupPage() {
    const router = useRouter();
@@ -23,7 +23,7 @@ export default function SignupPage() {
          user.username.trim().length > 0 && 
          user.email.trim().length > 0 && 
          user.password.trim().length > 0 && 
-         passwordStrength >= 4 // Ensure password meets strength requirements
+         passwordStrength >= 4 
       ) {
          setButtonDisabled(false);
       }
