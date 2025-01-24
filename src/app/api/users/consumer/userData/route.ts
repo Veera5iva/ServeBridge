@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { connect } from "@/dbConfig/dbConfig";
 import { getDataFromToken } from "@/helpers/getDataFromToken";
-import Consumer from "@/models/consumerModel";
+import { Consumer } from "@/models";
 import { NextRequest, NextResponse } from "next/server";
 
 

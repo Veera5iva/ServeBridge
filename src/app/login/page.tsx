@@ -37,8 +37,9 @@ export default function LoginPage() {
             if (role === "consumer") {
                router.push("/consumer/profile");
             } else if (role === "provider") {
-               router.push("/provider-dashboard");
+               router.push("/provider/profile");
             }
+            toast.success("Login successful");
          }
       } catch (error) {
          if(error instanceof Error) return toast.error(error.message);
