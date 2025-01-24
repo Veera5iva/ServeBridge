@@ -49,7 +49,7 @@ export default function LoginPage() {
    };
 
    return (
-      <div className="flex flex-col items-center justify-center py-2 min-h-screen gap-y-4 max-w-md mx-auto">
+      <div className="flex flex-col items-center justify-center py-2 min-h-screen gap-y-4 max-w-[280px] mx-auto">
          <Toaster position="top-right" reverseOrder={false}/>
          <h1 className="text-3xl text-center">{loading ? "Processing" : "Login"}</h1>
          
