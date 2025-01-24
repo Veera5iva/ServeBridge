@@ -15,7 +15,7 @@ export default function Home() {
 
          <button
             className="bg-yellow-200 text-black p-2"
-            onClick={() => router.push("/consumer/login")}
+            onClick={() => router.push("/signup")}
 
             >Signup
          </button>

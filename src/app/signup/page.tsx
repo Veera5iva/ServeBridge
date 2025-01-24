@@ -12,6 +12,8 @@ export default function SignupPage() {
    const [user, setUser] = useState({
       username: "",
       email: "",
+      phone: "",
+      role: "",
       password: "",
    });
    const [buttonDisabled, setButtonDisabled] = useState(true);
@@ -31,12 +33,18 @@ export default function SignupPage() {
    }, [user, passwordStrength])
 
    const onSignup = async () => {
+      if(!user.role) {
+         toast.error("Please select a role");
+         return;
+      }
+      if(!user.role) return toast.error("Please select a role");
       try {
          setLoading(true);
-         const response = await axios.post("/api/users/consumer/signup", user)
+         console.log(user);
+         const response = await axios.post("/api/users/signup", user)
          console.log("User signed up successfully", response.data);
          toast.success("Signup Successful!");
-         router.push("/consumer/login")
+         router.push("/login")
          
       } catch (error : unknown) {
          console.log("Signup failed", error);
@@ -49,7 +57,7 @@ export default function SignupPage() {
    };
 
    return (
-      <div className="flex flex-col items-center justify-center py-2 min-h-screen gap-y-4 max-w-[350px] mx-auto">
+      <div className="flex flex-col items-center justify-center py-2 min-h-screen gap-y-4 max-w-[330px] mx-auto">
          <Toaster position="top-right" reverseOrder={false}/>
          <h1 className="text-3xl text-center">{loading ? "Processing" : "Signup"}</h1>
          
@@ -76,6 +84,35 @@ export default function SignupPage() {
                   onChange={(e) => setUser({...user, email: e.target.value})}
                   placeholder="Enter your email"
                />
+            </div>
+
+            <div>
+               <label htmlFor="phone" className="block text-sm font-medium mb-1">Phone</label>
+               <input
+                  className="w-full p-2 rounded-md text-black"
+                  type="phone"
+                  id="phone"
+                  value={user.phone}
+                  onChange={(e) => setUser({...user, phone: e.target.value})}
+                  placeholder="Enter your phone number"
+               />
+            </div>
+
+            <div className="w-full ">
+               <label htmlFor="role" className="block text-sm font-medium mb-1">Role</label>
+               <select
+                  className="w-full p-2 rounded-md text-black"
+                  name="role"
+                  id="role"
+                  value={user.role}
+                  onChange={(e) => setUser({ ...user, role: e.target.value })}
+               >
+                  <option value="" disabled>
+                     Select Role
+                  </option>
+                  <option value="consumer">Consumer</option>
+                  <option value="provider">Provider</option>
+               </select>
             </div>
             
             <div>
