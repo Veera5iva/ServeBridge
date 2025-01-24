@@ -32,7 +32,7 @@ const providerSchema = new mongoose.Schema({
     },
     serviceType: {
       type: String,
-      required: [true, "Please provide a service type"], 
+      // required: [false, "Please provide a service type"], 
       trim: true,
     },
     description: {
@@ -63,3 +63,6 @@ const providerSchema = new mongoose.Schema({
 const Provider = mongoose.models.providers || mongoose.model("Provider", providerSchema);
 
 export default Provider;
+
+// veera12@gmail.com
+// Veera@12

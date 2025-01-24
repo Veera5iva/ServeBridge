@@ -51,6 +51,6 @@ const consumerSchema = new mongoose.Schema({
    verifyTokenExpiry: Date,
 }, { timestamps: true });
 
-const Consumer = mongoose.models.users || mongoose.model("Consumer", consumerSchema);
+const Consumer = mongoose.models.consumers || mongoose.model("Consumer", consumerSchema);
 
 export default Consumer;
