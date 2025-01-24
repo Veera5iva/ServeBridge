@@ -23,7 +23,7 @@ export default function ProfilePage() {
    }
 
    const getUserDetails = async () => {
-      const response = await axios.get("/api/users/userData");
+      const response = await axios.get("/api/users/provider/userData");
       console.log(response.data);
       setData(response.data.data._id);
 
@@ -37,7 +37,7 @@ export default function ProfilePage() {
          <h1 className="text-3xl">Profile</h1>
          <hr />
          <p className="text-2xl">Profile page</p>
-         <h2>{data === "nothing" ? "No data" : <Link href={`/profile/${data}`}>Visit Profile</Link>}</h2>
+         <h2>{data === "nothing" ? "No data" : <Link href={`/provider/profile/${data}`}>Visit Profile</Link>}</h2>
          <button
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
             onClick={getUserDetails}

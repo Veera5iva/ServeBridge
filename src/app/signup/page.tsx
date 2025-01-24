@@ -37,7 +37,6 @@ export default function SignupPage() {
          toast.error("Please select a role");
          return;
       }
-      if(!user.role) return toast.error("Please select a role");
       try {
          setLoading(true);
          console.log(user);
