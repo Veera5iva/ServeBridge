@@ -18,19 +18,17 @@ export default function SignupPage() {
    });
    const [buttonDisabled, setButtonDisabled] = useState(true);
    const [loading, setLoading] = useState(false);
-   const [passwordStrength, setPasswordStrength] = useState(0);
 
    useEffect(() => {
       if(
          user.username.trim().length > 0 && 
          user.email.trim().length > 0 && 
-         user.password.trim().length > 0 && 
-         passwordStrength >= 4 
+         user.password.trim().length > 6
       ) {
          setButtonDisabled(false);
       }
       else setButtonDisabled(true);
-   }, [user, passwordStrength])
+   }, [user])
 
    const onSignup = async () => {
       if(!user.role) {
@@ -116,11 +114,10 @@ export default function SignupPage() {
             
             <div>
                <label htmlFor="password" className="block text-sm font-medium mb-1">Password</label>
-               <PasswordInput 
+               <PasswordInput
                   password={user.password}
-                  onPasswordChange={(password, strength) => {
-                     setUser({...user, password});
-                     setPasswordStrength(strength);
+                  onPasswordChange={(password) => {
+                     setUser({ ...user, password });
                   }}
                />
             </div>

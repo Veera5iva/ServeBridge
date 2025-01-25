@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
-import { Eye, EyeOff } from 'lucide-react';
+import { PasswordInput } from "@/components";
 
 export default function LoginPage() {
    const router = useRouter();
@@ -15,10 +15,9 @@ export default function LoginPage() {
 
    const [buttonDisabled, setButtonDisabled] = useState(true);
    const [loading, setLoading] = useState(false);
-   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
    useEffect(() => {
-      if(user.email.trim().length > 0 && user.password.trim().length > 0) {
+      if(user.email.trim().length > 5 && user.password.trim().length > 6) {
          setButtonDisabled(false);
       }
       else setButtonDisabled(true);
@@ -69,23 +68,12 @@ export default function LoginPage() {
             
             <div>
                <label htmlFor="password" className="block text-sm font-medium mb-1">Password</label>
-               <div className="relative">
-                  <input
-                     className="w-full p-2 rounded-md text-black pr-10"
-                     type={isPasswordVisible ? "text" : "password"}
-                     id="password"
-                     value={user.password}
-                     onChange={(e) => setUser({...user, password: e.target.value})}
-                     placeholder="Enter your password"
-                  />
-                  <button
-                     type="button"
-                     onClick={() => setIsPasswordVisible(!isPasswordVisible)}
-                     className="absolute inset-y-0 right-0 px-3 flex items-center"
-                  >
-                     {isPasswordVisible ? <EyeOff size={16} /> : <Eye size={16} />}
-                  </button>
-               </div>
+               <PasswordInput
+                  password={user.password}
+                  onPasswordChange={(password) => {
+                     setUser({ ...user, password });
+                  }}
+               />
             </div>
             
             <button
