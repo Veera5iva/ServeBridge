@@ -1,21 +1,7 @@
-import React from 'react'
-
-export default function Dashboard() {
+export default function ProviderDashboard() {
    return (
       <div className="min-h-screen bg-gray-50 text-black">
-         <header className="border-b bg-white">
-            <div className="container flex h-16 items-center justify-between px-4">
-               <h1 className="text-2xl font-bold">Service Provider Dashboard</h1>
-               <div className="flex items-center gap-4">
-                  <div className="relative">
-                     <div className="w-6 h-6 bg-gray-300"></div>
-                     <span className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">2</span>
-                  </div>
-                  <div className="w-6 h-6 bg-gray-300"></div>
-               </div>
-            </div>
-         </header>
-
+         
          <main className="container mx-auto p-4">
             <div className="grid gap-6 md:grid-cols-2">
                <div className="border rounded-lg">
