@@ -34,9 +34,9 @@ export default function LoginPage() {
 
             const role = response.data.role;
             if (role === "consumer") {
-               router.push("/consumer/profile");
+               router.push("/consumer/dashboard");
             } else if (role === "provider") {
-               router.push("/provider/profile");
+               router.push("/provider/dashboard");
             }
             toast.success("Login successful");
          }

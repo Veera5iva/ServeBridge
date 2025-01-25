@@ -3,9 +3,11 @@ import { Bell, User } from 'lucide-react';
 import Link from 'next/link';
 
 interface DashboardHeaderProps {
-   role: "provider" | "consumer"
-   notifications?: number
- }
+  role: "provider" | "consumer"
+  notifications?: number
+}
+
+
  
  export default function DashboardHeader({ role, notifications = 0 }: DashboardHeaderProps) {
   return (
@@ -31,6 +33,7 @@ interface DashboardHeaderProps {
         </div>
       </div>
     </header>
+    
   );
 };
 
