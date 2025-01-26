@@ -3,26 +3,33 @@ import mongoose from "mongoose";
 const serviceSchema = new mongoose.Schema({
   providerId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Provider', 
+    ref: 'Provider',
     required: true,
   },
-  consumerId: {
+  serviceType: {
+    type: String,
+    required: true,
+  },
+  description: {
+    type: String,
+    required: false,
+  },
+  startTime: {
+    type: Date,
+    required: true,
+  },
+  endTime: {
+    type: Date,
+    required: true,
+  },
+  consumers: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Consumer', 
-    required: true,
-  },
+    ref: 'Consumer',
+  }],
   status: {
     type: String,
     enum: ['Requested', 'Accepted', 'In Progress', 'Completed', 'Canceled', 'Rejected'],
     default: 'Requested',
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now,
   },
 }, { timestamps: true });
 

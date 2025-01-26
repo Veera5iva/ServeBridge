@@ -27,9 +27,13 @@ const consumerSchema = new mongoose.Schema({
    role: {
       type: String,
       required: true,
-      enum: ["consumer"], 
-      default: "consumer", 
-    },
+      enum: ["consumer"],
+      default: "consumer",
+   },
+   requestedServices: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Service"
+   }],
    location: {
       type: {
          type: String,
@@ -37,7 +41,7 @@ const consumerSchema = new mongoose.Schema({
          default: "Point"
       },
       coordinates: {
-         type: [Number], 
+         type: [Number],
          required: false
       }
    },
