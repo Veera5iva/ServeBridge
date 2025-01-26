@@ -1,16 +1,18 @@
 "use client";
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Bell, User } from 'lucide-react';
 import Link from 'next/link';
 import axios from 'axios';
-import toast from 'react-hot-toast';
+import toast, { Toaster } from 'react-hot-toast';
 
 interface DashboardHeaderProps {
    notifications?: number
 }
 
 export default function ProviderDashboard({ notifications = 0 }: DashboardHeaderProps) {
+
+   const [providerId, setProviderId] = useState('');
    const [announceService, setAnnounceService] = useState({
       serviceType: '',
       description: '',
@@ -19,20 +21,42 @@ export default function ProviderDashboard({ notifications = 0 }: DashboardHeader
    });
    const [serviceAnnounced, setServiceAnnounced] = useState(false);
 
+   useEffect(() => {
+      const getProviderId = async () => {
+         try {
+            const response = await axios.get("/api/users/userdata");
+            setProviderId(response.data.data._id);
+         } catch (error: any) {
+            toast.error(error.message);
+         }
+      }
+      getProviderId();
+   }, [])
+
+
    const onAnnounceService = async (e: any) => {
       e.preventDefault();
+      if(!announceService.serviceType || !announceService.description || !announceService.startTime || !announceService.endTime) return toast.error("Service details are required");
       try {
-         console.log(announceService);
-         const response = await axios.post("/api/users/provider/announceService", announceService);
-         console.log(response.data);
-         setServiceAnnounced(true);
-         toast.success("Service announced successfully");
-         setAnnounceService({
-            serviceType: '',
-            description: '',
-            startTime: '',
-            endTime: ''
-         })
+         const serviceData = {providerId, ...announceService};
+         console.log(serviceData);
+         if (!serviceAnnounced) {
+            const response = await axios.post("/api/users/provider/announceService", serviceData);
+            console.log(response.data);
+            toast.success("Service announced successfully");
+         } else {
+            const response = await axios.delete("/api/users/provider/cancelService", { data: {providerId, serviceType: announceService.serviceType} });
+            console.log(response.data);
+            toast.error("Service canceled successfully");
+            setAnnounceService({
+               serviceType: '', 
+               description: '', 
+               startTime: '', 
+               endTime: '' 
+            });
+         }
+         setServiceAnnounced((prev) => !prev);
+         
       } catch (error: any) {
          toast.error(error.message);
       }
@@ -40,6 +64,7 @@ export default function ProviderDashboard({ notifications = 0 }: DashboardHeader
    }
    return (
       <div>
+         <Toaster position="top-right" reverseOrder={false}/>
          <header className="sticky top-0 z-50 border-b bg-white shadow-sm">
             <div className="container mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
                <h1 className="text-2xl font-semibold text-gray-800">Service Provider Dashboard</h1>
@@ -109,14 +134,9 @@ export default function ProviderDashboard({ notifications = 0 }: DashboardHeader
                               </div>
                            </div>
                            <button
-                              className="w-full bg-blue-500 text-white p-2 rounded"
+                              className={`w-full ${serviceAnnounced ? 'bg-red-500 hover:bg-red-600' : 'bg-blue-500 hover:bg-blue-600'} text-white p-2 rounded`}
                               onClick={onAnnounceService}
-                           >
-                              {serviceAnnounced ? (
-                                 <button
-                                    className="w-full bg-red-500 text-white p-2 rounded">Cancel Service
-                                 </button>
-                              ) : ('Announce Service')}
+                           > {serviceAnnounced ? "Cancel Service" : "Announce Service"}
                            </button>
                         </form>
                      </div>

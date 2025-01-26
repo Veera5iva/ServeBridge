@@ -15,11 +15,11 @@ const serviceSchema = new mongoose.Schema({
     required: false,
   },
   startTime: {
-    type: Date,
+    type: String,
     required: true,
   },
   endTime: {
-    type: Date,
+    type: String,
     required: true,
   },
   consumers: [{
@@ -34,5 +34,5 @@ const serviceSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 
-const Service = mongoose.models.Service || mongoose.model('Service', serviceSchema);
+const Service = mongoose.models.services || mongoose.model('Service', serviceSchema);
 export default Service;
