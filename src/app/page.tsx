@@ -28,7 +28,9 @@ export default function Home() {
             <div className="text-center mb-12">
                <h2 className="text-4xl font-bold text-gray-900 mb-4">Connect with Local Service Providers</h2>
                <p className="text-xl text-gray-600 mb-8">Find reliable services or offer your expertise to those in need</p>
-               <button className="px-6 py-3 bg-blue-500 text-white text-lg rounded hover:bg-blue-600">
+               <button
+                  onClick={() => router.push('/signup')}
+                  className="px-6 py-3 bg-blue-500 text-white text-lg rounded hover:bg-blue-600">
                   Get Started
                </button>
             </div>
