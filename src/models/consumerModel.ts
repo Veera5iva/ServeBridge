@@ -30,6 +30,10 @@ const consumerSchema = new mongoose.Schema({
       enum: ["consumer"], 
       default: "consumer", 
     },
+    requestedServices: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Service"
+    }],
    location: {
       type: {
          type: String,
