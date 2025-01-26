@@ -33,30 +33,54 @@ export default function ProviderDashboard({ notifications = 0 }: DashboardHeader
       getProviderId();
    }, [])
 
+   useEffect(() => {
+      const getAnnouncedService = async () => {
+         try {
+            const response = await axios.get(`/api/users/provider/services/getAnnouncedService`, { params: { providerId } });
+            console.log(response.data);
+
+            const service = response.data.data;
+            console.log(service);
+            if (service) {
+               setAnnounceService({
+                  serviceType: service.serviceType || "",
+                  description: service.description || "",
+                  startTime: service.startTime || "",
+                  endTime: service.endTime || ""
+               });
+               setServiceAnnounced(true);
+            }
+
+         } catch (error: any) {
+            toast.error(error.message);
+         }
+      }
+      if (providerId) getAnnouncedService();
+   }, [providerId])
 
    const onAnnounceService = async (e: any) => {
       e.preventDefault();
-      if(!announceService.serviceType || !announceService.description || !announceService.startTime || !announceService.endTime) return toast.error("Service details are required");
+      if (!announceService.serviceType || !announceService.description || !announceService.startTime || !announceService.endTime) return toast.error("Service details are required");
       try {
-         const serviceData = {providerId, ...announceService};
+         const serviceData = { providerId, ...announceService };
          console.log(serviceData);
          if (!serviceAnnounced) {
-            const response = await axios.post("/api/users/provider/announceService", serviceData);
+            const response = await axios.post("/api/users/provider/services/announceService", serviceData);
             console.log(response.data);
             toast.success("Service announced successfully");
          } else {
-            const response = await axios.delete("/api/users/provider/cancelService", { data: {providerId, serviceType: announceService.serviceType} });
+            const response = await axios.delete("/api/users/provider/services/cancelService", { data: { providerId, serviceType: announceService.serviceType } });
             console.log(response.data);
-            toast.error("Service canceled successfully");
+            toast.success("Service canceled successfully");
             setAnnounceService({
-               serviceType: '', 
-               description: '', 
-               startTime: '', 
-               endTime: '' 
+               serviceType: '',
+               description: '',
+               startTime: '',
+               endTime: ''
             });
          }
          setServiceAnnounced((prev) => !prev);
-         
+
       } catch (error: any) {
          toast.error(error.message);
       }
@@ -64,7 +88,7 @@ export default function ProviderDashboard({ notifications = 0 }: DashboardHeader
    }
    return (
       <div>
-         <Toaster position="top-right" reverseOrder={false}/>
+         <Toaster position="top-right" reverseOrder={false} />
          <header className="sticky top-0 z-50 border-b bg-white shadow-sm">
             <div className="container mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
                <h1 className="text-2xl font-semibold text-gray-800">Service Provider Dashboard</h1>
@@ -117,7 +141,7 @@ export default function ProviderDashboard({ notifications = 0 }: DashboardHeader
                               <div className="space-y-2">
                                  <label className="block text-sm font-medium">Start Time</label>
                                  <input
-                                    type="time"
+                                    type="text"
                                     className="w-full p-2 border rounded"
                                     value={announceService.startTime}
                                     onChange={(e) => setAnnounceService({ ...announceService, startTime: e.target.value })}
@@ -126,7 +150,7 @@ export default function ProviderDashboard({ notifications = 0 }: DashboardHeader
                               <div className="space-y-2">
                                  <label className="block text-sm font-medium">End Time</label>
                                  <input
-                                    type="time"
+                                    type="text"
                                     className="w-full p-2 border rounded"
                                     value={announceService.endTime}
                                     onChange={(e) => setAnnounceService({ ...announceService, endTime: e.target.value })}
@@ -188,7 +212,6 @@ export default function ProviderDashboard({ notifications = 0 }: DashboardHeader
             </main>
          </div>
       </div>
-
 
    )
 }
