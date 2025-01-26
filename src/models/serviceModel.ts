@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const serviceSchema = new mongoose.Schema({
   providerId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Provider', 
+    ref: 'Provider',
     required: true,
   },
   serviceType: {
