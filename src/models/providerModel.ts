@@ -30,15 +30,10 @@ const providerSchema = new mongoose.Schema({
       enum: ["provider"], 
       default: "provider", 
     },
-    serviceType: {
-      type: String,
-      // required: [false, "Please provide a service type"], 
-      trim: true,
-    },
-    description: {
-      type: String,
-      maxlength: 1000, 
-    },
+    services: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Service",
+    }],
     location: {
       type: {
         type: String,
