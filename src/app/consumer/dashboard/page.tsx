@@ -1,12 +1,61 @@
-import React from 'react';
+"use client";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import axios from 'axios';
 import { Bell, User } from 'lucide-react';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 
 interface DashboardHeaderProps {
    notifications?: number
 }
+interface availableService {
+   serviceType: string;
+   description: string;
+   startTime: string;
+   endTime: string;
+}
 
 export default function ConsumerDashboard({ notifications = 0 }: DashboardHeaderProps) {
+   const [availabeServices, setAvailableServices] = useState<availableService[]>([{
+      serviceType: '',
+      description: '',
+      startTime: '',
+      endTime: ''
+   }]);
+
+   const [isServiceAvailable, setIsServiceAvailable] = useState(false);
+
+   const fetchAvailableServices = async () => {
+      try {
+         const response = await axios.get('/api/users/consumer/services/getAvailableServices');
+         console.log(response.data);
+
+         const services = response.data.data;
+         console.log(services);
+         if(services.length > 0) {
+            const formattedServices = services.map((service: any) => ({
+               serviceType: service.serviceType || '',
+               description: service.description || '',
+               startTime: service.startTime || '',
+               endTime: service.endTime || ''
+            }))
+            setIsServiceAvailable(true);
+            setAvailableServices(formattedServices);
+         } else {
+            setIsServiceAvailable(false);
+         }
+      } catch (error: any) {
+      toast.error(error.message);
+      }
+   }
+
+   useEffect(() => {
+      fetchAvailableServices();
+      const interval = setInterval(fetchAvailableServices, 5000);
+
+      return () => clearInterval(interval);
+   }, [])
 
    return (
       <div>
@@ -40,14 +89,16 @@ export default function ConsumerDashboard({ notifications = 0 }: DashboardHeader
                      </div>
                      <div className="p-4">
                         <div className="space-y-4">
-                           <div className="rounded-lg border p-4">
-                              <h3 className="font-semibold">Service Type</h3>
-                              <p className="text-sm text-gray-500">Service Description</p>
-                              <div className="mt-2 flex items-center justify-between">
-                                 <span className="text-sm">10:00 AM - 12:00 PM</span>
-                                 <button className="bg-blue-500 text-white px-3 py-1 rounded text-sm">Request Service</button>
+                           {isServiceAvailable ? (availabeServices.map((service, index) => (
+                              <div key={index} className="rounded-lg border p-4">
+                                 <h3 className="font-semibold">{availabeServices[index].serviceType}</h3>
+                                 <p className="text-sm text-gray-500">{availabeServices[index].description}</p>
+                                 <div className="mt-2 flex items-center justify-between">
+                                    <span className="text-sm">{availabeServices[index].startTime} - {availabeServices[index].endTime}</span>
+                                    <button className="bg-blue-500 text-white px-3 py-1 rounded text-sm">Request Service</button>
+                                 </div>
                               </div>
-                           </div>
+                           ))) : ("No services available")}
                         </div>
                      </div>
                   </div>
