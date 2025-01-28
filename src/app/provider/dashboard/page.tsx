@@ -2,16 +2,22 @@
 // app/provider/dashboard/page.tsx
 import axios from 'axios';
 import Dashboard from './Dashboard';
+// import { NextRequest } from 'next/server';
 
 export default async function ProviderDashboardPage() {
+   
    console.log(`${process.env.NEXT_PUBLIC_API_URL}/api/users/userdata`);
    console.log(process.env.NEXT_PUBLIC_API_URL); // Ensure this prints the correct URL
 
    try {
       // Fetch providerId
-      const providerResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/users/userdata`);
-      console.log("Provider Response:", providerResponse.data); // Log the response data
-      const providerId = providerResponse.data.data._id;
+      const providerResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/userdata`, {
+         method: "GET",
+         credentials: "include", // Ensure cookies are sent
+       })
+      const providerData = await  providerResponse.json();
+      console.log("Provider Response:", providerData); // Log the response data
+      const providerId = providerData.data._id;
       console.log("Provider ID:", providerId);
 
       // Fetch announced service for the provider

@@ -10,6 +10,7 @@ connect();
 export async function GET(request: NextRequest) {
    try {
       const data = await getDataFromToken(request);
+      console.log(data);
       let user;
 
       if (data?.role === "provider") {

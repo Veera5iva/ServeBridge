@@ -4,8 +4,9 @@ import { NextRequest } from "next/server";
 
 export const getDataFromToken = (request: NextRequest) => {
    try {
+      console.log("Cookies:", request.cookies.getAll());
       const token = request.cookies.get("token")?.value || "";
-      if (!token) throw new Error("Token not found");
+      if (!token) throw new Error(`Token not found, cookies: ${request.cookies.getAll()}`);
 
       const decodedToken: any = Jwt.verify(token, process.env.TOKEN_SECRET!);
       const { id, role } = decodedToken;
