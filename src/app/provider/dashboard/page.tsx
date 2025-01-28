@@ -2,43 +2,43 @@
 // app/provider/dashboard/page.tsx
 import axios from 'axios';
 import Dashboard from './Dashboard';
-// import { NextRequest } from 'next/server';
+import { headers } from 'next/headers'; // Import headers utility
 
 export default async function ProviderDashboardPage() {
-   
-   console.log(`${process.env.NEXT_PUBLIC_API_URL}/api/users/userdata`);
-   console.log(process.env.NEXT_PUBLIC_API_URL); // Ensure this prints the correct URL
-
    try {
+      // Access cookies from the request headers
+      const headersList = await headers();
+      const cookies = headersList.get('cookie'); // Get the 'cookie' header
+
+      console.log("Cookies:", cookies); // Log cookies to ensure they are being accessed
+
       // Fetch providerId
+      
       const providerResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/userdata`, {
          method: "GET",
-         credentials: "include", // Ensure cookies are sent
-       })
-      const providerData = await  providerResponse.json();
+         headers: {
+            Cookie: cookies || "", // Pass cookies to the external API
+         },
+      });
+      const providerData = await providerResponse.json();
       console.log("Provider Response:", providerData); // Log the response data
+
       const providerId = providerData.data._id;
       console.log("Provider ID:", providerId);
 
       // Fetch announced service for the provider
-      const announcedServiceResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/users/provider/services/getAnnouncedService`, {
-         params: { providerId },
-      });
+      const announcedServiceResponse = await axios.get(
+         `${process.env.NEXT_PUBLIC_API_URL}/api/users/provider/services/getAnnouncedService`,
+         {
+            params: { providerId },
+         }
+      );
       console.log("Announced Service Response:", announcedServiceResponse.data); // Log the response data
-
-      const { serviceType, description, startTime, endTime } = announcedServiceResponse.data.data;
-
-      const announcedService = {
-         serviceType,
-         description,
-         startTime,
-         endTime
-      };
 
       return (
          <Dashboard
             providerId={providerId}
-            initialService={announcedService || null}
+            initialService={null}
          />
       );
    } catch (error: any) {
