@@ -11,6 +11,7 @@ export async function GET (request: NextRequest) {
       
       const service = await Service.findOne({providerId});
       
+      
       return NextResponse.json({message: "Service fetched successfully", success: true, data: service});
       
    } catch (error: any) {

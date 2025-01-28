@@ -46,7 +46,11 @@ export async function POST(request: NextRequest) {
       })
 
       // set cookies  
-      response.cookies.set("token", token, {httpOnly: true})
+      response.cookies.set("token", token, {
+         httpOnly: true,
+         secure: process.env.NODE_ENV === "production", // Will be `false` in development
+         path: "/", // Ensure cookie is available across the app
+       });
 
       return response;
       
