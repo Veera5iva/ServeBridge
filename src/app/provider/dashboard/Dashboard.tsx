@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// app/provider/dashboard/Dashboard.tsx
 "use client";
 import { useState } from 'react';
-import { User } from 'lucide-react';
+import { Bell, User } from 'lucide-react';
 import Link from 'next/link';
 import axios from 'axios';
 import toast, { Toaster } from 'react-hot-toast';
@@ -16,13 +15,10 @@ interface DashboardProps {
       endTime: string;
    } | null;
    error?: string;
+   notifications?: number;
 }
 
-// interface DashboardHeaderProps {
-//    notifications?: number
-// }
-
-export default function Dashboard({ providerId, initialService, error }: DashboardProps) {
+export default function Dashboard({ providerId, initialService, error, notifications = 0 }: DashboardProps) {
    const [announceService, setAnnounceService] = useState(
       initialService || {
          serviceType: '',
@@ -41,14 +37,12 @@ export default function Dashboard({ providerId, initialService, error }: Dashboa
 
       try {
          if (serviceAnnounced) {
-            // Cancel the service
             await axios.delete("/api/users/provider/services/cancelService", {
                data: { providerId, serviceType: announceService.serviceType },
             });
             setAnnounceService({ serviceType: "", description: "", startTime: "", endTime: "" });
             toast.success("Service canceled successfully.");
          } else {
-            // Announce a new service
             await axios.post("/api/users/provider/services/announceService", {
                providerId,
                ...announceService,
@@ -70,16 +64,17 @@ export default function Dashboard({ providerId, initialService, error }: Dashboa
          <Toaster position="top-right" reverseOrder={false} />
          <header className="sticky top-0 z-50 border-b bg-white shadow-sm">
             <div className="container mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-               <h1 className="text-2xl font-semibold text-gray-800">Service Provider Dashboard</h1>
+               <h1 className="text-2xl font-semibold text-gray-800 cursor-pointer"
+                  onClick={() => window.location.href = "/provider/dashboard"}>Service Provider Dashboard</h1>
                <div className="flex items-center space-x-4">
-                  {/* <button className="relative rounded-full p-2 hover:bg-gray-100 focus:outline-none">
+                  <button className="relative rounded-full p-2 hover:bg-gray-100 focus:outline-none">
                      <Bell className="h-6 w-6 text-gray-600" />
                      {notifications > 0 && (
                         <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
                            {notifications}
                         </span>
                      )}
-                  </button> */}
+                  </button>
                   <Link href="/provider/profile" className="rounded-full hover:bg-gray-100">
                      <button className="p-2 focus:outline-none">
                         <User className="h-6 w-6 text-gray-600" />

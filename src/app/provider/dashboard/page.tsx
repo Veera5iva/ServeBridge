@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// app/provider/dashboard/page.tsx
 import axios from 'axios';
 import Dashboard from './Dashboard';
 import { headers } from 'next/headers'; // Import headers utility
@@ -10,35 +9,36 @@ export default async function ProviderDashboardPage() {
       const headersList = await headers();
       const cookies = headersList.get('cookie'); // Get the 'cookie' header
 
-      console.log("Cookies:", cookies); // Log cookies to ensure they are being accessed
-
-      // Fetch providerId
-      
-      const providerResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/userdata`, {
-         method: "GET",
+      const providerResponse = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/users/userdata`, {
          headers: {
-            Cookie: cookies || "", // Pass cookies to the external API
+            Cookie: cookies || "", 
          },
       });
-      const providerData = await providerResponse.json();
-      console.log("Provider Response:", providerData); // Log the response data
-
-      const providerId = providerData.data._id;
-      console.log("Provider ID:", providerId);
-
-      // Fetch announced service for the provider
+      const providerId = providerResponse.data.data._id;
+      
       const announcedServiceResponse = await axios.get(
          `${process.env.NEXT_PUBLIC_API_URL}/api/users/provider/services/getAnnouncedService`,
          {
             params: { providerId },
          }
       );
-      console.log("Announced Service Response:", announcedServiceResponse.data); // Log the response data
+
+      const announcedService = announcedServiceResponse.data.data
+         ? {
+            serviceType: announcedServiceResponse.data.data.serviceType,
+            description: announcedServiceResponse.data.data.description,
+            startTime: announcedServiceResponse.data.data.startTime,
+            endTime: announcedServiceResponse.data.data.endTime,
+         }
+         : null; // Set to null if no service exists;
+
+      const notifications =  0;
 
       return (
          <Dashboard
             providerId={providerId}
-            initialService={null}
+            initialService={announcedService}
+            notifications={notifications}
          />
       );
    } catch (error: any) {
