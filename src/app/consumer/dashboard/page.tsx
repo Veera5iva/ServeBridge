@@ -91,10 +91,10 @@ export default function ConsumerDashboard({ notifications = 0 }: DashboardHeader
                         <div className="space-y-4">
                            {isServiceAvailable ? (availabeServices.map((service, index) => (
                               <div key={index} className="rounded-lg border p-4">
-                                 <h3 className="font-semibold">{availabeServices[index].serviceType}</h3>
-                                 <p className="text-sm text-gray-500">{availabeServices[index].description}</p>
+                                 <h3 className="font-semibold">{service.serviceType}</h3>
+                                 <p className="text-sm text-gray-500">{service.description}</p>
                                  <div className="mt-2 flex items-center justify-between">
-                                    <span className="text-sm">{availabeServices[index].startTime} - {availabeServices[index].endTime}</span>
+                                    <span className="text-sm">{service.startTime} - {service.endTime}</span>
                                     <button className="bg-blue-500 text-white px-3 py-1 rounded text-sm">Request Service</button>
                                  </div>
                               </div>
