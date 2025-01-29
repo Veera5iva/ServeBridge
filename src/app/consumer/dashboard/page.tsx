@@ -1,15 +1,16 @@
-"use client";
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import axios from 'axios';
-import { Bell, User } from 'lucide-react';
-import Link from 'next/link';
-import { useEffect, useState } from 'react';
-import toast from 'react-hot-toast';
+"use client";
+import axios from "axios";
+import { Bell, User } from "lucide-react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 interface DashboardHeaderProps {
-   notifications?: number
+   notifications?: number;
 }
-interface availableService {
+
+interface AvailableService {
    serviceType: string;
    description: string;
    startTime: string;
@@ -17,48 +18,29 @@ interface availableService {
 }
 
 export default function ConsumerDashboard({ notifications = 0 }: DashboardHeaderProps) {
-   const [availabeServices, setAvailableServices] = useState<availableService[]>([{
-      serviceType: '',
-      description: '',
-      startTime: '',
-      endTime: ''
-   }]);
-
-   const [isServiceAvailable, setIsServiceAvailable] = useState(false);
+   const [availableServices, setAvailableServices] = useState<AvailableService[]>([]);
 
    const fetchAvailableServices = async () => {
       try {
-         const response = await axios.get('/api/users/consumer/services/getAvailableServices');
-         console.log(response.data);
+         const response = await axios.get(`/api/users/consumer/services/getAvailableServices`);
 
-         const services = response.data.data;
-         console.log(services);
-         if(services.length > 0) {
-            const formattedServices = services.map((service: any) => ({
-               serviceType: service.serviceType || '',
-               description: service.description || '',
-               startTime: service.startTime || '',
-               endTime: service.endTime || ''
-            }))
-            setIsServiceAvailable(true);
-            setAvailableServices(formattedServices);
-         } else {
-            setIsServiceAvailable(false);
-         }
+         const services: AvailableService[] = response.data?.data || [];
+         setAvailableServices(services);
       } catch (error: any) {
-      toast.error(error.message);
+         console.error("Error fetching services:", error);
+         toast.error(error.message || "Failed to fetch services");
       }
-   }
+   };
 
    useEffect(() => {
       fetchAvailableServices();
       const interval = setInterval(fetchAvailableServices, 5000);
-
       return () => clearInterval(interval);
-   }, [])
+   }, []);
 
    return (
       <div>
+         {/* Header */}
          <header className="sticky top-0 z-50 border-b bg-white shadow-sm">
             <div className="container mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
                <h1 className="text-2xl font-semibold text-gray-800">Consumer Dashboard</h1>
@@ -80,29 +62,39 @@ export default function ConsumerDashboard({ notifications = 0 }: DashboardHeader
             </div>
          </header>
 
+         {/* Main Content */}
          <div className="min-h-screen bg-gray-50 text-black">
             <main className="container mx-auto p-4">
                <div className="grid gap-6 md:grid-cols-2">
+
+                  {/* Available Services */}
                   <div className="border rounded-lg">
                      <div className="p-4 border-b">
                         <h2 className="text-lg font-semibold">Available Services</h2>
                      </div>
                      <div className="p-4">
-                        <div className="space-y-4">
-                           {isServiceAvailable ? (availabeServices.map((service, index) => (
-                              <div key={index} className="rounded-lg border p-4">
-                                 <h3 className="font-semibold">{service.serviceType}</h3>
-                                 <p className="text-sm text-gray-500">{service.description}</p>
-                                 <div className="mt-2 flex items-center justify-between">
-                                    <span className="text-sm">{service.startTime} - {service.endTime}</span>
-                                    <button className="bg-blue-500 text-white px-3 py-1 rounded text-sm">Request Service</button>
+                        {availableServices.length > 0 ? (
+                           <div className="space-y-4">
+                              {availableServices.map((service, index) => (
+                                 <div key={index} className="rounded-lg border p-4">
+                                    <h3 className="font-semibold">{service.serviceType}</h3>
+                                    <p className="text-sm text-gray-500">{service.description}</p>
+                                    <div className="mt-2 flex items-center justify-between">
+                                       <span className="text-sm">{service.startTime} - {service.endTime}</span>
+                                       <button className="bg-blue-500 text-white px-3 py-1 rounded text-sm">
+                                          Request Service
+                                       </button>
+                                    </div>
                                  </div>
-                              </div>
-                           ))) : ("No services available")}
-                        </div>
+                              ))}
+                           </div>
+                        ) : (
+                           <p className="text-gray-500 text-center">No services available at the moment.</p>
+                        )}
                      </div>
                   </div>
 
+                  {/* My Requests */}
                   <div className="border rounded-lg">
                      <div className="p-4 border-b">
                         <h2 className="text-lg font-semibold">My Requests</h2>
@@ -121,6 +113,7 @@ export default function ConsumerDashboard({ notifications = 0 }: DashboardHeader
                      </div>
                   </div>
 
+                  {/* Services Near Me */}
                   <div className="md:col-span-2 border rounded-lg">
                      <div className="p-4 border-b">
                         <h2 className="text-lg font-semibold">Services Near Me</h2>
@@ -135,5 +128,5 @@ export default function ConsumerDashboard({ notifications = 0 }: DashboardHeader
             </main>
          </div>
       </div>
-   )
+   );
 }
