@@ -11,6 +11,7 @@ interface DashboardHeaderProps {
 }
 
 interface AvailableService {
+   _id: string;
    serviceType: string;
    description: string;
    startTime: string;
@@ -19,6 +20,7 @@ interface AvailableService {
 
 export default function ConsumerDashboard({ notifications = 0 }: DashboardHeaderProps) {
    const [availableServices, setAvailableServices] = useState<AvailableService[]>([]);
+   console.log(availableServices);
 
    const fetchAvailableServices = async () => {
       try {
@@ -26,6 +28,7 @@ export default function ConsumerDashboard({ notifications = 0 }: DashboardHeader
 
          const services: AvailableService[] = response.data?.data || [];
          setAvailableServices(services);
+         
       } catch (error: any) {
          console.error("Error fetching services:", error);
          toast.error(error.message || "Failed to fetch services");
@@ -81,8 +84,12 @@ export default function ConsumerDashboard({ notifications = 0 }: DashboardHeader
                                     <p className="text-sm text-gray-500">{service.description}</p>
                                     <div className="mt-2 flex items-center justify-between">
                                        <span className="text-sm">{service.startTime} - {service.endTime}</span>
-                                       <button className="bg-blue-500 text-white px-3 py-1 rounded text-sm">
-                                          Request Service
+                                       <button
+                                          className="bg-blue-500 text-white px-3 py-1 rounded text-sm"
+                                          onClick={() => console.log(service._id)
+                                          }
+                                          
+                                          >Request Service
                                        </button>
                                     </div>
                                  </div>
