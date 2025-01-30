@@ -2,7 +2,7 @@
 
    export default function page() {
    return (
-      <div>page</div>
+      <div className="bg-black h-screen text-white">page</div>
    )
    }
    

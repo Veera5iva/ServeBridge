@@ -23,11 +23,18 @@ const userSchema = new Schema({
     role:{
         type:String,
         enum:["consumer","worker","admin"],
+        default:"consumer",
         required:true
     },
     isVerified:{
         type:Boolean,
         default:false,
+    },
+    otp:{
+        type:String
+    },
+    otpExpiry:{
+        type:Date
     },
     createdAt:{
         type:Date,
