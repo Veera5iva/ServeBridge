@@ -12,6 +12,9 @@ interface DashboardHeaderProps {
 
 interface AvailableService {
    _id: string;
+   providerId: {
+      _id: string;
+   }
    serviceType: string;
    description: string;
    startTime: string;
@@ -27,6 +30,8 @@ export default function ConsumerDashboard({ notifications = 0 }: DashboardHeader
          const response = await axios.get(`/api/users/consumer/services/getAvailableServices`);
 
          const services: AvailableService[] = response.data?.data || [];
+         console.log(services);
+         
          setAvailableServices(services);
          
       } catch (error: any) {
@@ -40,6 +45,29 @@ export default function ConsumerDashboard({ notifications = 0 }: DashboardHeader
       const interval = setInterval(fetchAvailableServices, 5000);
       return () => clearInterval(interval);
    }, []);
+
+   const fetchUserId = async () => {
+      try {
+         const userResponse = await axios.get(`/api/users/userdata`);
+         const userId = userResponse.data.data._id;
+         return userId;
+         
+      } catch (error: any) {
+         console.error("Error fetching user ID:", error);
+         toast.error(error.message || "Failed to fetch user ID");
+      }
+   }
+
+   const handleServiceRequest = async (serviceId: string, providerId: string) => {
+      try {
+         const userId = await fetchUserId();
+         console.log(userId);
+         
+      } catch (error: any) {
+         console.error("Error handling service request:", error);
+         toast.error(error.message || "Failed to process the service request");
+      }
+   }
 
    return (
       <div>
@@ -86,9 +114,7 @@ export default function ConsumerDashboard({ notifications = 0 }: DashboardHeader
                                        <span className="text-sm">{service.startTime} - {service.endTime}</span>
                                        <button
                                           className="bg-blue-500 text-white px-3 py-1 rounded text-sm"
-                                          onClick={() => console.log(service._id)
-                                          }
-                                          
+                                          onClick={() => handleServiceRequest(service._id, service.providerId._id)}
                                           >Request Service
                                        </button>
                                     </div>

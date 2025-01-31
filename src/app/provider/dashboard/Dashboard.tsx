@@ -147,10 +147,32 @@ export default function Dashboard({ providerId, initialService, error, notificat
                      <div className="p-4">
                         <div className="space-y-4">
                            <div className="rounded-lg border p-4">
-                              <h3 className="font-semibold">Service Type</h3>
-                              <p className="text-sm text-gray-500 mb-2">Service Description</p>
+                              <h3 className="font-semibold mb-2">Consumer Name</h3>
+                              {/* <p className="text-sm text-gray-500 mb-2">Service Description</p> */}
                               <div className="space-y-2 text-sm">
-                                 <p className="flex items-center">👤 Consumer Name</p>
+                                 {/* <p className="flex items-center">👤 Consumer Name</p> */}
+                                 <p className="flex items-center">📱 Contact Number</p>
+                                 <p className="flex items-center">📍 Location</p>
+                              </div>
+                              <div className="mt-4 flex justify-between">
+                                 <button className="border px-3 py-1 rounded text-sm">
+                                    Get Directions
+                                 </button>
+                                 <div>
+                                    <button className="border border-red-500 text-red-500 px-3 py-1 rounded text-sm mr-2">
+                                       Reject
+                                    </button>
+                                    <button className="bg-blue-500 text-white px-3 py-1 rounded text-sm">
+                                       Accept
+                                    </button>
+                                 </div>
+                              </div>
+                           </div>
+                           <div className="rounded-lg border p-4">
+                              <h3 className="font-semibold mb-2">Consumer Name</h3>
+                              {/* <p className="text-sm text-gray-500 mb-2">Service Description</p> */}
+                              <div className="space-y-2 text-sm">
+                                 {/* <p className="flex items-center">👤 Consumer Name</p> */}
                                  <p className="flex items-center">📱 Contact Number</p>
                                  <p className="flex items-center">📍 Location</p>
                               </div>
