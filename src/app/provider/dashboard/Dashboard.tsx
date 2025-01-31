@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Bell, User } from 'lucide-react';
 import Link from 'next/link';
 import axios from 'axios';
@@ -17,6 +17,10 @@ interface DashboardProps {
    error?: string;
    notifications?: number;
 }
+interface requestedConsumer {
+   username: string;
+   phone: string;
+}
 
 export default function Dashboard({ providerId, initialService, error, notifications = 0 }: DashboardProps) {
    const [announceService, setAnnounceService] = useState(
@@ -28,6 +32,29 @@ export default function Dashboard({ providerId, initialService, error, notificat
       }
    );
    const [serviceAnnounced, setServiceAnnounced] = useState(!!initialService);
+   const [requestedConsumers, setRequestedConsumers] = useState<requestedConsumer[]>([]);
+
+   const requestedConsumersData = async () => {
+      if(!serviceAnnounced) return;
+      try {
+         const response = await axios.get("/api/users/provider/services/getRequestedConsumers", {
+            params: {providerId}
+         });
+         console.log(response.data.data.requestedConsumers);
+         const consumer: requestedConsumer[] = response.data?.data.requestedConsumers || [];
+         if(consumer) setRequestedConsumers(consumer);
+         
+      } catch (error: any) {
+         console.error(error);
+      }
+   };
+   useEffect(() => {
+      if(!serviceAnnounced) return;
+      requestedConsumersData();
+      const interval = setInterval(requestedConsumersData, 5000);
+      return () => clearInterval(interval);
+   // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [serviceAnnounced])
 
    const onAnnounceService = async (e: any) => {
       e.preventDefault();
@@ -146,28 +173,33 @@ export default function Dashboard({ providerId, initialService, error, notificat
                      </div>
                      <div className="p-4">
                         <div className="space-y-4">
-                           <div className="rounded-lg border p-4">
-                              <h3 className="font-semibold mb-2">Consumer Name</h3>
-                              {/* <p className="text-sm text-gray-500 mb-2">Service Description</p> */}
-                              <div className="space-y-2 text-sm">
-                                 {/* <p className="flex items-center">👤 Consumer Name</p> */}
-                                 <p className="flex items-center">📱 Contact Number</p>
-                                 <p className="flex items-center">📍 Location</p>
-                              </div>
-                              <div className="mt-4 flex justify-between">
-                                 <button className="border px-3 py-1 rounded text-sm">
-                                    Get Directions
-                                 </button>
-                                 <div>
-                                    <button className="border border-red-500 text-red-500 px-3 py-1 rounded text-sm mr-2">
-                                       Reject
-                                    </button>
-                                    <button className="bg-blue-500 text-white px-3 py-1 rounded text-sm">
-                                       Accept
-                                    </button>
+                           {serviceAnnounced && requestedConsumers.length > 0 ? (
+                              requestedConsumers.map((consumer, index) => (
+                                 <div key={index} className="rounded-lg border p-4">
+                                    <h3 className="font-semibold mb-2">{consumer.username}</h3>
+                                    <div className="space-y-2 text-sm">
+                                       <p className="flex items-center">📱 {consumer.phone}</p>
+                                       <p className="flex items-center">📍 Location</p>
+                                    </div>
+                                    <div className="mt-4 flex justify-between">
+                                       <button className="border px-3 py-1 rounded text-sm">
+                                          Get Directions
+                                       </button>
+                                       <div>
+                                          <button className="border border-red-500 text-red-500 px-3 py-1 rounded text-sm mr-2">
+                                             Reject
+                                          </button>
+                                          <button className="bg-blue-500 text-white px-3 py-1 rounded text-sm">
+                                             Accept
+                                          </button>
+                                       </div>
+                                    </div>
                                  </div>
-                              </div>
-                           </div>
+                              ))  
+                           ) : (
+                              <p className="text-gray-500 text-center">No service announced at the moment.</p>
+                           )}
+
                            <div className="rounded-lg border p-4">
                               <h3 className="font-semibold mb-2">Consumer Name</h3>
                               {/* <p className="text-sm text-gray-500 mb-2">Service Description</p> */}
