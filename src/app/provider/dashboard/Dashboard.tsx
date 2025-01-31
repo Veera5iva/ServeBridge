@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Bell, User } from 'lucide-react';
 import Link from 'next/link';
 import axios from 'axios';
@@ -34,7 +34,7 @@ export default function Dashboard({ providerId, initialService, error, notificat
    const [serviceAnnounced, setServiceAnnounced] = useState(!!initialService);
    const [requestedConsumers, setRequestedConsumers] = useState<requestedConsumer[]>([]);
 
-   const requestedConsumersData = async () => {
+   const requestedConsumersData = useCallback(async () => {
       if (!serviceAnnounced) return;
       try {
          const response = await axios.get("/api/users/provider/services/getRequestedConsumers", {
@@ -46,14 +46,14 @@ export default function Dashboard({ providerId, initialService, error, notificat
       } catch (error: any) {
          console.error(error);
       }
-   };
+   }, [providerId, serviceAnnounced]);
+
    useEffect(() => {
       if (!serviceAnnounced) return;
       requestedConsumersData();
       const interval = setInterval(requestedConsumersData, 5000);
       return () => clearInterval(interval);
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, [serviceAnnounced])
+   }, [requestedConsumersData, serviceAnnounced])
 
    const onAnnounceService = async (e: any) => {
       e.preventDefault();
@@ -90,8 +90,9 @@ export default function Dashboard({ providerId, initialService, error, notificat
          <Toaster position="top-right" reverseOrder={false} />
          <header className="sticky top-0 z-50 border-b bg-white shadow-sm">
             <div className="container mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-               <h1 className="text-2xl font-semibold text-gray-800 cursor-pointer"
-                  onClick={() => window.location.href = "/provider/dashboard"}>Service Provider Dashboard</h1>
+               <Link href="/provider/dashboard">
+                  <h1 className="text-2xl font-semibold text-gray-800 cursor-pointer">Service Provider Dashboard</h1>
+               </Link>
                <div className="flex items-center space-x-4">
                   <button className="relative rounded-full p-2 hover:bg-gray-100 focus:outline-none">
                      <Bell className="h-6 w-6 text-gray-600" />
@@ -212,9 +213,13 @@ export default function Dashboard({ providerId, initialService, error, notificat
                         </div>
                      </div>
                   </div>
+
                </div>
+
             </main>
+
          </div>
+         
       </div>
    );
 }

@@ -3,7 +3,7 @@
 import axios from "axios";
 import { Bell, User } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 interface DashboardHeaderProps {
@@ -26,26 +26,24 @@ export default function Dashboard({ consumerId, notifications = 0 }: DashboardHe
    const [availableServices, setAvailableServices] = useState<AvailableService[]>([]);
    console.log(availableServices);
 
-   const fetchAvailableServices = async () => {
+   const fetchAvailableServices = useCallback(async () => {
       try {
          const response = await axios.get(`/api/users/consumer/services/getAvailableServices`);
-
          const services: AvailableService[] = response.data?.data || [];
          console.log(services);
          
          setAvailableServices(services);
-         
       } catch (error: any) {
          console.error("Error fetching services:", error);
          toast.error(error.message || "Failed to fetch services");
       }
-   };
+   }, []);
 
    useEffect(() => {
       fetchAvailableServices();
       const interval = setInterval(fetchAvailableServices, 5000);
       return () => clearInterval(interval);
-   }, []);
+   }, [fetchAvailableServices]);
 
    const handleServiceRequest = async (serviceId: string) => {
       try {
