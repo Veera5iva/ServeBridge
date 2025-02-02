@@ -197,7 +197,7 @@ export default function Dashboard({ providerId, initialService, error, notificat
                                  </div>
                               ))
                            ) : (
-                              <p className="text-gray-500 text-center">No service announced at the moment.</p>
+                              <p className="text-gray-500 text-center">No service announced at the moment or no active requests.</p>
                            )}
                         </div>
                      </div>
