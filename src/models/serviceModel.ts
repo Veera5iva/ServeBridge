@@ -23,14 +23,16 @@ const serviceSchema = new mongoose.Schema({
     required: true,
   },
   requestedConsumers: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Consumer',
-  }],
-  status: {
-    type: String,
-    enum: ['Requested', 'Accepted', 'In Progress', 'Completed', 'Canceled', 'Rejected'],
-    default: 'Requested',
-  },
+    consumer: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Consumer',
+    },
+    status: {
+      type: String,
+      enum: ['Requested', 'Accepted', 'In Progress', 'Completed', 'Canceled', 'Rejected'],
+      default: 'Requested',
+    }
+  }]
 }, { timestamps: true });
 
 
