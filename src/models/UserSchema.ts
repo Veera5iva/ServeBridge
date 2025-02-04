@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 import { Schema } from "mongoose";
-
 const userSchema = new Schema({
     name:{
         type:String,
@@ -41,4 +40,8 @@ const userSchema = new Schema({
         default:Date.now
     }
 })
+if (mongoose.models.User) {
+    delete mongoose.models.User;
+}
+
 export const User = mongoose.model("User",userSchema);

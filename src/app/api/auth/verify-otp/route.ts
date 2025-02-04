@@ -1,6 +1,7 @@
 import { User } from "@/models/UserSchema";
 import { signIn } from "next-auth/react";
 import { NextResponse } from "next/server";
+import bcrypt from "bcrypt";
 
 export async function POST(req:Request){
     try {
@@ -9,8 +10,12 @@ export async function POST(req:Request){
         if(!user){
             return NextResponse.json({message:"User not Found"})
         }
-        if(otp !== user.otp || user.otpExpiry!.getTime() < Date.now()){
-            return NextResponse.json({message:"Invalid OTP or OTP expired!"})
+        if (!user.otpExpiry || !user.otp || user.otpExpiry.getTime() < Date.now()) {
+            return NextResponse.json({ message: "OTP Expired or Invalid" })
+        }
+        const isValidOTP = bcrypt.compare(otp,user.otp);
+        if(!isValidOTP){
+            return NextResponse.json({message:"Invalid OTP"})
         }
         user.isVerified = true;
         user.otp = null;

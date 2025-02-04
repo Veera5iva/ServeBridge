@@ -20,7 +20,7 @@ import {
     InputOTPGroup,
     InputOTPSlot,
 } from "@/components/ui/input-otp"
-import { useToast } from "@/hooks/use-toast"
+import axios from "axios"
 
 
 const FormSchema = z.object({
@@ -30,7 +30,6 @@ const FormSchema = z.object({
 })
 
 export function InputOTPForm() {
-    const { toast } = useToast()
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
         defaultValues: {
@@ -38,8 +37,18 @@ export function InputOTPForm() {
         },
     })
 
-    function onSubmit(data: z.infer<typeof FormSchema>) {
-        console.log(data);
+    async function onSubmit(data: z.infer<typeof FormSchema>) {
+        try {
+            const email = sessionStorage.getItem("email");
+            const payload = {
+                email,
+                otp:data.pin
+            }
+            const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/verify-otp`,payload);
+            console.log(response.data.session);
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     return (

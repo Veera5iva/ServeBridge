@@ -10,7 +10,8 @@ import { useState } from "react"
 import z from "zod";
 import { SubmitHandler, useForm } from 'react-hook-form';
 import {zodResolver} from "@hookform/resolvers/zod"
-import { watch } from "fs"
+import axios from "axios";
+import { useRouter } from "next/navigation"
 
 export default function SignUp() {
 
@@ -25,7 +26,7 @@ export default function SignUp() {
 
     const {register,handleSubmit,formState:{errors,isSubmitting},watch,setValue} = useForm<formType>({resolver:zodResolver(formSchema),defaultValues:{role:"consumer"}})
 
-
+    const router = useRouter();
 
     const [showPassword, setShowPassword] = useState(false)
 
@@ -33,7 +34,13 @@ export default function SignUp() {
         setShowPassword(!showPassword)
     }
     const onSubmit:SubmitHandler<formType> = async(data)=>{
-        console.log(data);
+        try {
+            await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/signup`,data);
+            sessionStorage.setItem('email',data.email);
+            router.push('/verify-otp');
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     return (

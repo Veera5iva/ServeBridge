@@ -13,11 +13,11 @@ export const NextAuthConfig = {
             },
             //@ts-ignore
             async authorize(credentials:any){
-                const user = await User.findOne(credentials.email);
+                const user = await User.findOne({ email: credentials.email });
                 if(!user) throw new Error("User not found");
                 if(!user.isVerified) throw new Error("User is not Verified");
 
-                const validPassword = await bcrypt.compare(user.password,credentials.password);
+                const validPassword = await bcrypt.compare(credentials.password, user.password);
                 if(!validPassword) throw new Error("Invalid Password!");
                 return {id:user._id,name:user.name,email:user.email,phone:user.phone,role:user.role}
             }

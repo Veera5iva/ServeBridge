@@ -4,28 +4,53 @@ import bcrypt from "bcrypt";
 import nodemailer from "nodemailer";
 import {google} from "googleapis";
 
+
 export async function POST(req:Request) {
     try {
-        const {name,email,password,phone,role} = await req.json();
-        const existingUser = await User.findOne({email});
-        if(existingUser){
-            return NextResponse.json({message:'User already exist. Please sign in!'})
-        }
-        const hashedPassword = await bcrypt.hash(password,10);
-        const otp = Math.floor(100000 + (Math.random() * 900000)).toString();
-        const otpExpiry = new Date(Date.now() + 5*(60*1000));
-        await User.create(name,email,hashedPassword,role,otp,otpExpiry);
-        sendEmail(email,otp);
-        return NextResponse.json({message:"User is created. Email is sended to verification"})
+        const { name, email, password, phone, role } = await req.json();
 
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return NextResponse.json(
+                { message: 'User already exists. Please sign in!' },
+                { status: 400 }
+            );
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        const hashedOTP = await bcrypt.hash(otp, 10);
+
+        const otpExpiry = new Date(Date.now() + 5 * 60 * 1000);
+
+        await User.create({
+            name,
+            email,
+            password: hashedPassword,
+            role,
+            phone,
+            otp: hashedOTP,
+            otpExpiry
+        });
+
+        await sendEmail(email, otp);
+
+        return NextResponse.json(
+            { message: "User is created. An email has been sent for verification." },
+            { status: 201 }
+        );
     } catch (error) {
-        console.log(error)
-        return NextResponse.json({Error:error})
+        console.error("Error during user registration:", error);
+        return NextResponse.json(
+            { error: "Internal server error" },
+            { status: 500 }
+        );
     }
 }
 
 
-function sendEmail(email:string,otp:string){
+
+async function sendEmail(email:string,otp:string){
 
     const oauth2Client = new google.auth.OAuth2(process.env.CLIENT_ID, process.env.CLIENT_SECRET, process.env.REDIRECT_URI);
     oauth2Client.setCredentials({ refresh_token: process.env.REFRESH_TOKEN });
@@ -48,8 +73,10 @@ function sendEmail(email:string,otp:string){
         text: `Your OTP is ${otp}. it expires in 5 minutes`
     }
 
-    transporter.sendMail(mailOption, (err, info) => {
-        if (err) console.error("Email Error:", err);
-        else console.log("OTP Sent:", info.response);
-    })
+    try {
+        const info = await transporter.sendMail(mailOption);
+        console.log("OTP Sent:", info.response);
+    } catch (err) {
+        console.error("Email Error:", err);
+    }
 }
