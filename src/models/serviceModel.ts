@@ -22,7 +22,7 @@ const serviceSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  requestedConsumers: [{
+  requests: [{
     consumer: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Consumer',
