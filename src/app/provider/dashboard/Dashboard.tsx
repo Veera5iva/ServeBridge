@@ -18,8 +18,11 @@ interface DashboardProps {
    notifications?: number;
 }
 interface requestedConsumer {
-   username: string;
-   phone: string;
+   consumer: {
+      username: string;
+      phone: string;
+   };
+   status: string;
 }
 
 export default function Dashboard({ providerId, initialService, error, notifications = 0 }: DashboardProps) {
@@ -40,8 +43,8 @@ export default function Dashboard({ providerId, initialService, error, notificat
          const response = await axios.get("/api/users/provider/services/getRequestedConsumers", {
             params: { providerId }
          });
-         console.log(response.data.data.requestedConsumers);
-         const consumer: requestedConsumer[] = response.data?.data.requestedConsumers || [];
+         console.log(response.data.data.requests);
+         const consumer: requestedConsumer[] = response.data?.data.requests || [];
          setRequestedConsumers(consumer);
       } catch (error: any) {
          console.error(error);
@@ -176,9 +179,9 @@ export default function Dashboard({ providerId, initialService, error, notificat
                            {serviceAnnounced && requestedConsumers.length > 0 ? (
                               requestedConsumers.map((consumer, index) => (
                                  <div key={index} className="rounded-lg border p-4">
-                                    <h3 className="font-semibold mb-2">{consumer.username}</h3>
+                                    <h3 className="font-semibold mb-2">{consumer.consumer.username}</h3>
                                     <div className="space-y-2 text-sm">
-                                       <p className="flex items-center">📱 {consumer.phone}</p>
+                                       <p className="flex items-center">📱 {consumer.consumer.phone}</p>
                                        <p className="flex items-center">📍 Location</p>
                                     </div>
                                     <div className="mt-4 flex justify-between">
