@@ -20,33 +20,42 @@ interface AvailableService {
    description: string;
    startTime: string;
    endTime: string;
-   requestedConsumers: {
+   requests: {
       consumer: string;
       status: string;
       _id: string;
    }[]
 }
 
-// interface RequestedService {
-//    _id: string;
-//    serviceType: string;
-//    description: string;
-//    status: string;
-// }
+interface RequestedService {
+   _id: string;
+   serviceType: string;
+   description: string;
+   status: string;
+}
 
 export default function Dashboard({ consumerId, notifications = 0 }: DashboardHeaderProps) {
    const [availableServices, setAvailableServices] = useState<AvailableService[]>([]);
-   // const [requestedServices, setRequestedServices] = useState<RequestedService[]>([]);
-   // console.log(availableServices);
+   const [requestedServices, setRequestedServices] = useState<RequestedService[]>([]);
 
    const fetchAvailableServices = useCallback(async () => {
       try {
          const response = await axios.get(`/api/users/consumer/services/getAvailableServices`);
          const services: AvailableService[] = response.data?.data || [];
-         console.log(services);
-         
-         const filteredServices = services.filter(service => !service.requestedConsumers.some(consumer => consumer.consumer === consumerId));
-         
+         // console.log(services);
+
+         const response2 = await axios.get(`/api/users/consumer/services/getRequestedServices`, {
+            params: {
+               consumerId: consumerId
+            }
+         });
+
+         const requestedService: RequestedService[] = response2.data?.data || [];
+         console.log(requestedService);
+         setRequestedServices(requestedService);
+
+         const filteredServices = services.filter(service => !service.requests.some(consumer => consumer.consumer === consumerId));
+
          setAvailableServices(filteredServices);
       } catch (error: any) {
          console.error("Error fetching services:", error);
@@ -71,8 +80,9 @@ export default function Dashboard({ consumerId, notifications = 0 }: DashboardHe
 
          if (response.data.success) {
             toast.success("Service requested successfully");
+            fetchAvailableServices();
          }
-         
+
       } catch (error: any) {
          console.error("Error handling service request:", error);
          toast.error(error.message || "Failed to process the service request");
@@ -81,7 +91,7 @@ export default function Dashboard({ consumerId, notifications = 0 }: DashboardHe
 
    return (
       <div>
-         <Toaster position="top-right" reverseOrder={false}/>
+         <Toaster position="top-right" reverseOrder={false} />
          {/* Header */}
          <header className="sticky top-0 z-50 border-b bg-white shadow-sm">
             <div className="container mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
@@ -126,7 +136,7 @@ export default function Dashboard({ consumerId, notifications = 0 }: DashboardHe
                                        <button
                                           className="bg-blue-500 text-white px-3 py-1 rounded text-sm"
                                           onClick={() => handleServiceRequest(service._id)}
-                                          >Request Service
+                                       >Request Service
                                        </button>
                                     </div>
                                  </div>
@@ -143,18 +153,24 @@ export default function Dashboard({ consumerId, notifications = 0 }: DashboardHe
                      <div className="p-4 border-b">
                         <h2 className="text-lg font-semibold">My Requests</h2>
                      </div>
-                     <div className="p-4">
-                        <div className="space-y-4">
-                           <div className="rounded-lg border p-4">
-                              <h3 className="font-semibold">Service Type</h3>
-                              <p className="text-sm text-gray-500">Service Description</p>
-                              <div className="mt-2 flex items-center justify-between">
-                                 <span className="text-sm">Status: Pending</span>
-                                 <button className="border px-3 py-1 rounded text-sm">Cancel Request</button>
+                     {requestedServices.length > 0 ? (
+                        requestedServices.map((service, index) => (
+                           <div key={index} className="p-4">
+                              <div className="space-y-4">
+                                 <div className="rounded-lg border p-4">
+                                    <h3 className="font-semibold">{service.serviceType}</h3>
+                                    <p className="text-sm text-gray-500">{service.description}</p>
+                                    <div className="mt-2 flex items-center justify-between">
+                                       <span className="text-sm">Status: {service.status}</span>
+                                       <button className="border px-3 py-1 rounded text-sm">Cancel Request</button>
+                                    </div>
+                                 </div>
                               </div>
                            </div>
-                        </div>
-                     </div>
+                        ))
+                     ) : (
+                        <p className="text-gray-500 text-center">No services available at the moment.</p>
+                     )}
                   </div>
 
                   {/* Services Near Me */}

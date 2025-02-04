@@ -7,8 +7,9 @@ export async function POST(request: NextRequest) {
    try {
       const reqBody = await request.json();
       const { serviceId, consumerId } = reqBody;
-      
-      await Service.findByIdAndUpdate(serviceId, { $addToSet: { requestedConsumers: {consumer: consumerId, status: "Requested"}}});
+
+
+      await Service.findByIdAndUpdate(serviceId, { $addToSet: { requests: {consumer: consumerId} } });
       await Consumer.findByIdAndUpdate(consumerId, { $addToSet: { requestedServices: serviceId } });
 
       return NextResponse.json({ message: "Service requested successfully", success: true });
