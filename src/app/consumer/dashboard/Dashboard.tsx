@@ -4,7 +4,7 @@ import axios from "axios";
 import { Bell, User } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import toast from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 
 interface DashboardHeaderProps {
    consumerId?: string;
@@ -20,11 +20,24 @@ interface AvailableService {
    description: string;
    startTime: string;
    endTime: string;
+   requestedConsumers: {
+      consumer: string;
+      status: string;
+      _id: string;
+   }[]
 }
+
+// interface RequestedService {
+//    _id: string;
+//    serviceType: string;
+//    description: string;
+//    status: string;
+// }
 
 export default function Dashboard({ consumerId, notifications = 0 }: DashboardHeaderProps) {
    const [availableServices, setAvailableServices] = useState<AvailableService[]>([]);
-   console.log(availableServices);
+   // const [requestedServices, setRequestedServices] = useState<RequestedService[]>([]);
+   // console.log(availableServices);
 
    const fetchAvailableServices = useCallback(async () => {
       try {
@@ -32,12 +45,14 @@ export default function Dashboard({ consumerId, notifications = 0 }: DashboardHe
          const services: AvailableService[] = response.data?.data || [];
          console.log(services);
          
-         setAvailableServices(services);
+         const filteredServices = services.filter(service => !service.requestedConsumers.some(consumer => consumer.consumer === consumerId));
+         
+         setAvailableServices(filteredServices);
       } catch (error: any) {
          console.error("Error fetching services:", error);
          toast.error(error.message || "Failed to fetch services");
       }
-   }, []);
+   }, [consumerId]);
 
    useEffect(() => {
       fetchAvailableServices();
@@ -53,6 +68,10 @@ export default function Dashboard({ consumerId, notifications = 0 }: DashboardHe
          }
          const response = await axios.post("/api/users/consumer/services/requestService", data);
          console.log(response.data);
+
+         if (response.data.success) {
+            toast.success("Service requested successfully");
+         }
          
       } catch (error: any) {
          console.error("Error handling service request:", error);
@@ -62,6 +81,7 @@ export default function Dashboard({ consumerId, notifications = 0 }: DashboardHe
 
    return (
       <div>
+         <Toaster position="top-right" reverseOrder={false}/>
          {/* Header */}
          <header className="sticky top-0 z-50 border-b bg-white shadow-sm">
             <div className="container mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
