@@ -44,6 +44,18 @@ export default function Dashboard({ consumerId, notifications = 0 }: DashboardHe
          const services: AvailableService[] = response.data?.data || [];
          // console.log(services);
 
+         const filteredServices = services.filter(service => !service.requests.some(consumer => consumer.consumer === consumerId));
+
+         setAvailableServices(filteredServices);
+      } catch (error: any) {
+         console.error("Error fetching services:", error);
+         toast.error(error.message || "Failed to fetch services");
+      }
+   }, [consumerId]);
+
+   const fetchRequestedServices = useCallback(async () => {
+      try {
+
          const response2 = await axios.get(`/api/users/consumer/services/getRequestedServices`, {
             params: {
                consumerId: consumerId
@@ -54,9 +66,6 @@ export default function Dashboard({ consumerId, notifications = 0 }: DashboardHe
          console.log(requestedService);
          setRequestedServices(requestedService);
 
-         const filteredServices = services.filter(service => !service.requests.some(consumer => consumer.consumer === consumerId));
-
-         setAvailableServices(filteredServices);
       } catch (error: any) {
          console.error("Error fetching services:", error);
          toast.error(error.message || "Failed to fetch services");
@@ -65,9 +74,13 @@ export default function Dashboard({ consumerId, notifications = 0 }: DashboardHe
 
    useEffect(() => {
       fetchAvailableServices();
-      const interval = setInterval(fetchAvailableServices, 5000);
+      fetchRequestedServices();
+      const interval = setInterval(() => {
+         fetchAvailableServices();
+         fetchRequestedServices();
+      }, 5000);
       return () => clearInterval(interval);
-   }, [fetchAvailableServices]);
+   }, [fetchAvailableServices, fetchRequestedServices]);
 
    const handleServiceRequest = async (serviceId: string) => {
       try {
@@ -134,7 +147,7 @@ export default function Dashboard({ consumerId, notifications = 0 }: DashboardHe
                                     <div className="mt-2 flex items-center justify-between">
                                        <span className="text-sm">{service.startTime} - {service.endTime}</span>
                                        <button
-                                          className="bg-blue-500 text-white px-3 py-1 rounded text-sm"
+                                          className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm"
                                           onClick={() => handleServiceRequest(service._id)}
                                        >Request Service
                                        </button>
@@ -162,7 +175,7 @@ export default function Dashboard({ consumerId, notifications = 0 }: DashboardHe
                                     <p className="text-sm text-gray-500">{service.description}</p>
                                     <div className="mt-2 flex items-center justify-between">
                                        <span className="text-sm">Status: {service.status}</span>
-                                       <button className="border px-3 py-1 rounded text-sm">Cancel Request</button>
+                                       <button className="border px-3 py-1 rounded text-sm text-white bg-red-500 hover:bg-red-600">Cancel Request</button>
                                     </div>
                                  </div>
                               </div>

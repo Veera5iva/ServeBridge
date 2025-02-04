@@ -9,9 +9,13 @@ export async function GET (request: NextRequest) {
       console.log(providerId);
       if (!providerId) return NextResponse.json({error: "Provider ID is required"}, {status: 400});
       
-      const service = await Service.findOne({providerId});
+      const service = await Service.findOne({providerId}).select("requests");
 
-      const consumers = await service.populate("requestedConsumers")
+      const consumers = await service.populate({
+         path: "requests.consumer",
+         select: "username phone"
+      })
+      console.log(consumers.requests);
       
       return NextResponse.json({message: "Requested consumers fetched successfully", success: true, data: consumers});
 
