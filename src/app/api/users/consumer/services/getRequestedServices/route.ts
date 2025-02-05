@@ -17,12 +17,15 @@ export async function GET (request: NextRequest) {
       const requestedServices = consumer.requestedServices.map((service: any) => {
          const request = service.requests.find((request: any) => request.consumer.toString() === consumerId);
          return {
-            _id: service._id,
+            serviceId: service._id,
             serviceType: service.serviceType,
             description: service.description,
+            requestId: request?._id,
             status: request?.status 
          }
       })
+      console.log(requestedServices);
+      
       
       return NextResponse.json({message: "Requested services fetched successfully", success: true, data: requestedServices});
       
