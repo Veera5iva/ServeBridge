@@ -17,11 +17,12 @@ interface DashboardProps {
    error?: string;
    notifications?: number;
 }
-interface requestedConsumer {
+interface requests {
    consumer: {
       username: string;
       phone: string;
    };
+   _id: string;
    status: string;
 }
 
@@ -35,7 +36,7 @@ export default function Dashboard({ providerId, initialService, error, notificat
       }
    );
    const [serviceAnnounced, setServiceAnnounced] = useState(!!initialService);
-   const [requestedConsumers, setRequestedConsumers] = useState<requestedConsumer[]>([]);
+   const [requests, setRequests] = useState<requests[]>([]);
 
    const requestedConsumersData = useCallback(async () => {
       if (!serviceAnnounced) return;
@@ -44,8 +45,8 @@ export default function Dashboard({ providerId, initialService, error, notificat
             params: { providerId }
          });
          console.log(response.data.data.requests);
-         const consumer: requestedConsumer[] = response.data?.data.requests || [];
-         setRequestedConsumers(consumer);
+         const consumer: requests[] = response.data?.data.requests || [];
+         setRequests(consumer);
       } catch (error: any) {
          console.error(error);
       }
@@ -58,7 +59,20 @@ export default function Dashboard({ providerId, initialService, error, notificat
       return () => clearInterval(interval);
    }, [requestedConsumersData, serviceAnnounced])
 
-   const onAnnounceService = async (e: any) => {
+   const handleCancelService = async (requestId: string) => {
+      try {
+         const data = {
+            providerId,
+            requestId,
+         }
+         
+      } catch (error: any) {
+         console.log(error);
+         toast.error(error.message)
+      }
+   }
+
+   const handleAnnounceService = async (e: any) => {
       e.preventDefault();
       if (!announceService.serviceType || !announceService.description || !announceService.startTime || !announceService.endTime) {
          return toast.error("Please fill in all service details.");
@@ -163,7 +177,7 @@ export default function Dashboard({ providerId, initialService, error, notificat
                            </div>
                            <button
                               className={`w-full ${serviceAnnounced ? 'bg-red-500 hover:bg-red-600' : 'bg-blue-500 hover:bg-blue-600'} text-white p-2 rounded`}
-                              onClick={onAnnounceService}
+                              onClick={handleAnnounceService}
                            > {serviceAnnounced ? "Cancel Service" : "Announce Service"}
                            </button>
                         </form>
@@ -176,24 +190,28 @@ export default function Dashboard({ providerId, initialService, error, notificat
                      </div>
                      <div className="p-4">
                         <div className="space-y-4">
-                           {serviceAnnounced && requestedConsumers.length > 0 ? (
-                              requestedConsumers.map((consumer, index) => (
+                           {requests.length > 0 ? (
+                              requests.map((request, index) => (
                                  <div key={index} className="rounded-lg border p-4">
-                                    <h3 className="font-semibold mb-2">{consumer.consumer.username}</h3>
+                                    <h3 className="font-semibold mb-2">{request.consumer.username}</h3>
                                     <div className="space-y-2 text-sm">
-                                       <p className="flex items-center">📱 {consumer.consumer.phone}</p>
-                                       <p className="flex items-center">📍 Location</p>
+                                       <p className="flex items-center">📱 {request.consumer.phone}</p>
+                                       <p className="flex items-center">📍 {request._id}</p>
                                     </div>
                                     <div className="mt-4 flex justify-between">
                                        <button className="border px-3 py-1 rounded text-sm">
                                           Get Directions
                                        </button>
                                        <div>
-                                          <button className="border border-red-500 text-red-500 px-3 py-1 rounded text-sm mr-2">
-                                             Reject
+                                          <button
+                                             className="border border-red-500 text-red-500 px-3 py-1 rounded text-sm mr-2"
+                                             onClick={() => handleRejectRequest(request._id)}
+                                             >Reject
                                           </button>
-                                          <button className="bg-blue-500 text-white px-3 py-1 rounded text-sm">
-                                             Accept
+                                          <button 
+                                             className="bg-blue-500 text-white px-3 py-1 rounded text-sm"
+                                             onClick={() => handleAcceptRequest(request._id)}
+                                             >Accept
                                           </button>
                                        </div>
                                     </div>
