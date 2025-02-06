@@ -116,7 +116,6 @@ export default function Dashboard({ providerId, initialService, error, notificat
          toast.success("Request status updated successfully.");
 
          setOpenDropdownId(null);
-         // Clear the temporary status selection for the next update
          setTempStatus("");
 
       } catch (error: any) {
@@ -255,46 +254,54 @@ export default function Dashboard({ providerId, initialService, error, notificat
                                        <p className="flex items-center">📍 {request._id}</p>
                                        <p className="flex items-center font-semibold">Status: {request.status}</p>
                                     </div>
-                                    <div className="mt-4 flex justify-between">
-                                       <button className="border px-3 py-1 rounded text-sm">
+                                    <div className="mt-4 flex flex-col md:flex-row md:justify-between">
+                                       <button className="border px-3 py-1 rounded text-sm mb-2 md:mb-0">
                                           Get Directions
                                        </button>
+
                                        {request.status === "Requested" && (
-                                          <div>
+                                          <div className="flex flex-col md:flex-row md:items-center md:space-x-2 space-y-2 md:space-y-0">
                                              <button
-                                                className="border border-red-500 text-red-500 px-3 py-1 rounded text-sm mr-2"
+                                                className="border border-red-500 text-red-500 px-3 py-1 rounded text-sm md:mr-2"
                                                 onClick={() => handleRejectRequest(request._id)}
-                                             >Reject
+                                             >
+                                                Reject
                                              </button>
                                              <button
                                                 className="bg-blue-500 text-white px-3 py-1 rounded text-sm"
                                                 onClick={() => handleAcceptRequest(request._id)}
-                                             >Accept
+                                             >
+                                                Accept
                                              </button>
                                           </div>
                                        )}
+
                                        {request.status === "Rejected" && (
                                           <div></div>
                                        )}
-                                       {(request.status !== "Requested" && request.status !== "Rejected"
-                                          && request.status !== "Completed" && openDropdownId !== request._id) && (
-                                             <div>
+
+                                       {(request.status !== "Requested" && request.status !== "Rejected" &&
+                                          request.status !== "Completed" && openDropdownId !== request._id) && (
+                                             <div className="flex flex-col md:flex-row md:items-center md:space-x-2 space-y-2 md:space-y-0">
                                                 <button
-                                                   className="border border-red-500 text-red-500 px-3 py-1 rounded text-sm mr-2"
-                                                   onClick={() => handleRejectRequest(request._id)}
-                                                >Reject
+                                                   className="bg-blue-500 text-white px-3 py-1 rounded text-sm md:mr-1"
+                                                   onClick={() => handleToggleStatusDropdown(request._id)}
+                                                >
+                                                   Update Status
                                                 </button>
                                                 <button
-                                                   className="bg-blue-500 text-white px-3 py-1 rounded text-sm"
-                                                   onClick={() => handleToggleStatusDropdown(request._id)}
-                                                >Update Status
+                                                   className="border border-red-500 text-red-500 px-3 py-1 rounded text-sm"
+                                                   onClick={() => handleRejectRequest(request._id)}
+                                                >
+                                                   Reject
                                                 </button>
                                              </div>
                                           )}
+
                                        {openDropdownId === request._id && request.status !== "Rejected" && (
-                                          <div className="flex items-center space-x-2">
+                                          <div className="flex flex-col md:flex-row md:items-center md:space-x-3 space-y-2 md:space-y-0">
                                              <select
-                                                className="p-1 border rounded"
+                                                className="p-1 border rounded w-full md:w-auto"
                                                 value={tempStatus}
                                                 onChange={(e) => setTempStatus(e.target.value)}
                                              >
@@ -303,20 +310,23 @@ export default function Dashboard({ providerId, initialService, error, notificat
                                                 <option value="In Progress">In Progress</option>
                                                 <option value="Completed">Completed</option>
                                              </select>
+
                                              <button
-                                                className="bg-blue-500 text-white px-3 py-1 rounded text-sm"
+                                                className="bg-blue-500 text-white px-3 py-1 rounded text-sm w-full md:w-auto"
                                                 onClick={() => handleConfirmStatusUpdate(request._id)}
                                              >Update Status
                                              </button>
+
                                              <button
-                                                className="border px-3 py-1 rounded text-sm"
+                                                className="border border-red-500 text-red-500 px-3 py-1 rounded text-sm w-full md:w-auto"
                                                 onClick={handleCancelStatusUpdate}
                                              >Cancel
                                              </button>
+
                                           </div>
                                        )}
-
                                     </div>
+
                                  </div>
                               ))
                            ) : (
