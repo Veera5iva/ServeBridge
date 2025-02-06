@@ -59,13 +59,35 @@ export default function Dashboard({ providerId, initialService, error, notificat
       return () => clearInterval(interval);
    }, [requestedConsumersData, serviceAnnounced])
 
-   const handleCancelService = async (requestId: string) => {
+   const handleRejectRequest = async (requestId: string) => {
       try {
          const data = {
             providerId,
             requestId,
+            status: "Rejected"
          }
+
+         const response = await axios.post("/api/users/provider/services/updateStatus", data);
          
+         if(response.data.success) {
+            toast.success("Request rejected successfully");
+         }
+
+
+      } catch (error: any) {
+         console.log(error);
+         toast.error(error.message)
+      }
+   }
+   
+   const handleAcceptRequest = async (requestId: string) => {
+      try {
+         const data = {
+            providerId,
+            requestId,
+            status: "Accepted"
+         }
+
       } catch (error: any) {
          console.log(error);
          toast.error(error.message)
@@ -206,12 +228,12 @@ export default function Dashboard({ providerId, initialService, error, notificat
                                           <button
                                              className="border border-red-500 text-red-500 px-3 py-1 rounded text-sm mr-2"
                                              onClick={() => handleRejectRequest(request._id)}
-                                             >Reject
+                                          >Reject
                                           </button>
-                                          <button 
+                                          <button
                                              className="bg-blue-500 text-white px-3 py-1 rounded text-sm"
                                              onClick={() => handleAcceptRequest(request._id)}
-                                             >Accept
+                                          >Accept
                                           </button>
                                        </div>
                                     </div>
@@ -240,7 +262,7 @@ export default function Dashboard({ providerId, initialService, error, notificat
             </main>
 
          </div>
-         
+
       </div>
    );
 }
