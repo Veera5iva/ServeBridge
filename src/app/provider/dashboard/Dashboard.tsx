@@ -17,11 +17,12 @@ interface DashboardProps {
    error?: string;
    notifications?: number;
 }
-interface requestedConsumer {
+interface requests {
    consumer: {
       username: string;
       phone: string;
    };
+   _id: string;
    status: string;
 }
 
@@ -35,7 +36,11 @@ export default function Dashboard({ providerId, initialService, error, notificat
       }
    );
    const [serviceAnnounced, setServiceAnnounced] = useState(!!initialService);
-   const [requestedConsumers, setRequestedConsumers] = useState<requestedConsumer[]>([]);
+   const [requests, setRequests] = useState<requests[]>([]);
+
+   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
+   const [tempStatus, setTempStatus] = useState<string>("");
+
 
    const requestedConsumersData = useCallback(async () => {
       if (!serviceAnnounced) return;
@@ -44,8 +49,8 @@ export default function Dashboard({ providerId, initialService, error, notificat
             params: { providerId }
          });
          console.log(response.data.data.requests);
-         const consumer: requestedConsumer[] = response.data?.data.requests || [];
-         setRequestedConsumers(consumer);
+         const consumer: requests[] = response.data?.data.requests || [];
+         setRequests(consumer);
       } catch (error: any) {
          console.error(error);
       }
@@ -58,7 +63,72 @@ export default function Dashboard({ providerId, initialService, error, notificat
       return () => clearInterval(interval);
    }, [requestedConsumersData, serviceAnnounced])
 
-   const onAnnounceService = async (e: any) => {
+   const handleRejectRequest = async (requestId: string) => {
+      try {
+         const response = await axios.post("/api/users/provider/services/updateStatus", {
+            providerId,
+            requestId,
+            status: "Rejected"
+         });
+
+         if (response.data.success) {
+            toast.success("Request rejected successfully");
+         }
+
+      } catch (error: any) {
+         console.log(error);
+         toast.error(error.message)
+      }
+   }
+
+   const handleAcceptRequest = async (requestId: string) => {
+      try {
+         const response = await axios.post("/api/users/provider/services/updateStatus", {
+            providerId,
+            requestId,
+            status: "Accepted"
+         });
+
+         if (response.data.success) {
+            toast.success("Request accepted successfully");
+         }
+
+      } catch (error: any) {
+         console.log(error);
+         toast.error(error.message)
+      }
+   }
+
+   const handleToggleStatusDropdown = (requestId: string) => {
+      setOpenDropdownId(requestId);
+   };
+
+   const handleConfirmStatusUpdate = async (requestId: string) => {
+      if (!tempStatus) {
+         return toast.error("Please select a status before updating.");
+      }
+      try {
+         await axios.post("/api/users/provider/services/updateStatus", {
+            providerId,
+            requestId,
+            status: tempStatus,
+         });
+         toast.success("Request status updated successfully.");
+
+         setOpenDropdownId(null);
+         // Clear the temporary status selection for the next update
+         setTempStatus("");
+
+      } catch (error: any) {
+         toast.error(error.response?.data?.message || "An error occurred while updating the status.");
+      }
+   };
+   const handleCancelStatusUpdate = () => {
+      setOpenDropdownId(null);
+      setTempStatus("");
+   };
+
+   const handleAnnounceService = async (e: any) => {
       e.preventDefault();
       if (!announceService.serviceType || !announceService.description || !announceService.startTime || !announceService.endTime) {
          return toast.error("Please fill in all service details.");
@@ -163,7 +233,7 @@ export default function Dashboard({ providerId, initialService, error, notificat
                            </div>
                            <button
                               className={`w-full ${serviceAnnounced ? 'bg-red-500 hover:bg-red-600' : 'bg-blue-500 hover:bg-blue-600'} text-white p-2 rounded`}
-                              onClick={onAnnounceService}
+                              onClick={handleAnnounceService}
                            > {serviceAnnounced ? "Cancel Service" : "Announce Service"}
                            </button>
                         </form>
@@ -176,26 +246,76 @@ export default function Dashboard({ providerId, initialService, error, notificat
                      </div>
                      <div className="p-4">
                         <div className="space-y-4">
-                           {serviceAnnounced && requestedConsumers.length > 0 ? (
-                              requestedConsumers.map((consumer, index) => (
-                                 <div key={index} className="rounded-lg border p-4">
-                                    <h3 className="font-semibold mb-2">{consumer.consumer.username}</h3>
+                           {requests.length > 0 ? (
+                              requests.map((request) => (
+                                 <div key={request._id} className="rounded-lg border p-4">
+                                    <h3 className="font-semibold mb-2">{request.consumer.username}</h3>
                                     <div className="space-y-2 text-sm">
-                                       <p className="flex items-center">📱 {consumer.consumer.phone}</p>
-                                       <p className="flex items-center">📍 Location</p>
+                                       <p className="flex items-center">📱 {request.consumer.phone}</p>
+                                       <p className="flex items-center">📍 {request._id}</p>
+                                       <p className="flex items-center font-semibold">Status: {request.status}</p>
                                     </div>
                                     <div className="mt-4 flex justify-between">
                                        <button className="border px-3 py-1 rounded text-sm">
                                           Get Directions
                                        </button>
-                                       <div>
-                                          <button className="border border-red-500 text-red-500 px-3 py-1 rounded text-sm mr-2">
-                                             Reject
-                                          </button>
-                                          <button className="bg-blue-500 text-white px-3 py-1 rounded text-sm">
-                                             Accept
-                                          </button>
-                                       </div>
+                                       {request.status === "Requested" && (
+                                          <div>
+                                             <button
+                                                className="border border-red-500 text-red-500 px-3 py-1 rounded text-sm mr-2"
+                                                onClick={() => handleRejectRequest(request._id)}
+                                             >Reject
+                                             </button>
+                                             <button
+                                                className="bg-blue-500 text-white px-3 py-1 rounded text-sm"
+                                                onClick={() => handleAcceptRequest(request._id)}
+                                             >Accept
+                                             </button>
+                                          </div>
+                                       )}
+                                       {request.status === "Rejected" && (
+                                          <div></div>
+                                       )}
+                                       {(request.status !== "Requested" && request.status !== "Rejected"
+                                          && request.status !== "Completed" && openDropdownId !== request._id) && (
+                                             <div>
+                                                <button
+                                                   className="border border-red-500 text-red-500 px-3 py-1 rounded text-sm mr-2"
+                                                   onClick={() => handleRejectRequest(request._id)}
+                                                >Reject
+                                                </button>
+                                                <button
+                                                   className="bg-blue-500 text-white px-3 py-1 rounded text-sm"
+                                                   onClick={() => handleToggleStatusDropdown(request._id)}
+                                                >Update Status
+                                                </button>
+                                             </div>
+                                          )}
+                                       {openDropdownId === request._id && request.status !== "Rejected" && (
+                                          <div className="flex items-center space-x-2">
+                                             <select
+                                                className="p-1 border rounded"
+                                                value={tempStatus}
+                                                onChange={(e) => setTempStatus(e.target.value)}
+                                             >
+                                                <option value="">Select status</option>
+                                                <option value="On My Way">On My Way</option>
+                                                <option value="In Progress">In Progress</option>
+                                                <option value="Completed">Completed</option>
+                                             </select>
+                                             <button
+                                                className="bg-blue-500 text-white px-3 py-1 rounded text-sm"
+                                                onClick={() => handleConfirmStatusUpdate(request._id)}
+                                             >Update Status
+                                             </button>
+                                             <button
+                                                className="border px-3 py-1 rounded text-sm"
+                                                onClick={handleCancelStatusUpdate}
+                                             >Cancel
+                                             </button>
+                                          </div>
+                                       )}
+
                                     </div>
                                  </div>
                               ))
@@ -222,7 +342,7 @@ export default function Dashboard({ providerId, initialService, error, notificat
             </main>
 
          </div>
-         
+
       </div>
    );
 }
