@@ -29,7 +29,7 @@ const serviceSchema = new mongoose.Schema({
     },
     status: {
       type: String,
-      enum: ['Requested', 'Accepted', 'In Progress', 'Completed', 'Canceled', 'Rejected'],
+      enum: ['Requested', 'Accepted', "On My Way", 'In Progress', 'Completed', 'Canceled', 'Rejected'],
       default: 'Requested',
     }
   }]
