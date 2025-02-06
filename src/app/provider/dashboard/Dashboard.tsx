@@ -284,13 +284,13 @@ export default function Dashboard({ providerId, initialService, error, notificat
                                           request.status !== "Completed" && openDropdownId !== request._id) && (
                                              <div className="flex flex-col md:flex-row md:items-center md:space-x-2 space-y-2 md:space-y-0">
                                                 <button
-                                                   className="bg-blue-500 text-white px-3 py-1 rounded text-sm md:mr-2"
+                                                   className="bg-blue-500 text-white px-3 py-1 rounded text-sm md:mr-1"
                                                    onClick={() => handleToggleStatusDropdown(request._id)}
                                                 >
                                                    Update Status
                                                 </button>
                                                 <button
-                                                   className="border border-red-500 text-red-500 px-3 py-1 rounded text-sm "
+                                                   className="border border-red-500 text-red-500 px-3 py-1 rounded text-sm"
                                                    onClick={() => handleRejectRequest(request._id)}
                                                 >
                                                    Reject
@@ -299,7 +299,7 @@ export default function Dashboard({ providerId, initialService, error, notificat
                                           )}
 
                                        {openDropdownId === request._id && request.status !== "Rejected" && (
-                                          <div className="flex flex-col md:flex-row md:items-center md:space-x-2 space-y-2 md:space-y-0">
+                                          <div className="flex flex-col md:flex-row md:items-center md:space-x-3 space-y-2 md:space-y-0">
                                              <select
                                                 className="p-1 border rounded w-full md:w-auto"
                                                 value={tempStatus}
@@ -318,7 +318,7 @@ export default function Dashboard({ providerId, initialService, error, notificat
                                              </button>
 
                                              <button
-                                                className="border px-3 py-1 rounded text-sm w-full md:w-auto"
+                                                className="border border-red-500 text-red-500 px-3 py-1 rounded text-sm w-full md:w-auto"
                                                 onClick={handleCancelStatusUpdate}
                                              >Cancel
                                              </button>
