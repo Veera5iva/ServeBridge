@@ -29,11 +29,11 @@ export default function ProfilePage() {
 
    }
    const setLocation = async () => {
-
+      router.push(`/consumer/location`);
    }
 
    const updateLocation = async () => {
-
+      router.push(`/consumer/location`);
    }
 
 
