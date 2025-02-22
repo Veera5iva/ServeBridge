@@ -3,6 +3,7 @@
 
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api"
 import axios from "axios"
+import { useRouter } from "next/navigation"
 import { useState, useRef, useCallback } from "react"
 import toast, { Toaster } from "react-hot-toast"
 
@@ -13,6 +14,7 @@ declare global {
 }
 
 export default function GoogleMapView() {
+   const router = useRouter();
    const containerStyle = {
       width: "60%",
       height: "80vh",
@@ -59,6 +61,7 @@ export default function GoogleMapView() {
       const response = await axios.patch("/api/users/consumer/location", { lat: markerPosition.lat, lng: markerPosition.lng });
       if (response.data.success) {
          toast.success("Location saved successfully");
+         router.push("/consumer/profile");
       }
    }
 
@@ -100,14 +103,7 @@ export default function GoogleMapView() {
                   <Marker position={markerPosition} />
                </GoogleMap>
             </LoadScript>
-
          }
-
-         <div className="ml-4">
-            <h2 className="text-xl font-bold mb-2">Selected Location:</h2>
-            <p>Latitude: {markerPosition.lat.toFixed(6)}</p>
-            <p>Longitude: {markerPosition.lng.toFixed(6)}</p>
-         </div>
       </div>
    )
 }
