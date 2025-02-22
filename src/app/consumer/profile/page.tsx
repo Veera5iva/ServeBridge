@@ -1,14 +1,20 @@
 "use client";
 import axios from "axios";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
+
+interface UserDetails {
+   username: string,
+   phone: string,
+   email: string,
+   location: boolean
+}
 
 
 export default function ProfilePage() {
    const router = useRouter();
-   const [data, setData] = useState("nothing");
+   const [userData, setUserData] = useState<UserDetails>({ username: "", phone: "", email: "", location: false });
    const logout = async () => {
       try {
          await axios.get("/api/users/logout");
@@ -21,21 +27,21 @@ export default function ProfilePage() {
       }
 
    }
+   useEffect(() => {
+      getUserDetails();
+   }, [])
 
    const getUserDetails = async () => {
       const response = await axios.get("/api/users/userdata");
       console.log(response.data);
-      setData(response.data.data.username);
-
+      const { username, phone, email, location } = response.data.data;
+      setUserData({
+         username,
+         phone,
+         email,
+         location: location?.coordinates?.length > 0 ? true : false
+      });
    }
-   const setLocation = async () => {
-      router.push(`/consumer/location`);
-   }
-
-   const updateLocation = async () => {
-      router.push(`/consumer/location`);
-   }
-
 
    return (
       <div className="min-h-screen bg-gray-50 py-12">
@@ -46,27 +52,6 @@ export default function ProfilePage() {
             {/* Header Section */}
             <div className="text-center mb-8">
                <h1 className="text-4xl font-bold text-gray-900">Profile</h1>
-               <div className="mt-4">
-                  <h2 className="text-xl text-gray-600">
-                     {data === "nothing" ? "No data" : <Link href={`/consumer/profile/${data}`}>Visit Profile</Link>}
-                  </h2>
-               </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex justify-center gap-4 mb-8">
-               <button
-                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition duration-200"
-                  onClick={getUserDetails}
-               >
-                  Get user details
-               </button>
-               <button
-                  className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-6 rounded-lg transition duration-200"
-                  onClick={logout}
-               >
-                  Logout
-               </button>
             </div>
 
             {/* Main Content Grid */}
@@ -84,7 +69,8 @@ export default function ProfilePage() {
                            type="text"
                            id="username"
                            className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
-                           value="JohnDoe"
+                           value={userData.username}
+                           readOnly
                         />
                      </div>
 
@@ -94,7 +80,7 @@ export default function ProfilePage() {
                            type="email"
                            id="email"
                            className="w-full border border-gray-300 rounded-lg p-3 bg-gray-50 text-black"
-                           value="johndoe@example.com"
+                           value={userData.email}
                            readOnly
                         />
                      </div>
@@ -106,6 +92,8 @@ export default function ProfilePage() {
                            id="phone"
                            className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
                            placeholder="Enter phone number"
+                           value={userData.phone}
+                           readOnly
                         />
                      </div>
                   </div>
@@ -116,21 +104,26 @@ export default function ProfilePage() {
                   {/* Location Card */}
                   <div className="bg-white rounded-xl shadow-md p-8">
                      <h3 className="text-2xl font-semibold mb-4 text-black">Location</h3>
-                     <p id="locationText" className="text-gray-500 mb-4">No location set</p>
+                     {/* <p id="locationText" className="text-gray-500 mb-4">No location set</p> */}
                      <div className="flex gap-4">
-                        <button
-                           className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition duration-200"
-                           onClick={setLocation}
-                        >
-                           Set Location
-                        </button>
-                        <button
-                           className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg hidden transition duration-200"
-                           id="updateLocation"
-                           onClick={updateLocation}
-                        >
-                           Update Location
-                        </button>
+                        {userData.location ? (
+                           <button
+                              className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg transition duration-200"
+                              id="updateLocation"
+                              onClick={() => router.push(`/consumer/location`)}
+                           >
+                              Update Location
+                           </button>
+
+                        ) : (
+                           <button
+                              className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition duration-200"
+                              onClick={() => router.push(`/consumer/location`)}
+                           >
+                              Set Location
+                           </button>
+                        )}
+
                      </div>
                   </div>
 
@@ -142,6 +135,7 @@ export default function ProfilePage() {
                            type="checkbox"
                            id="notifications"
                            className="w-5 h-5 rounded text-blue-500 focus:ring-blue-500 border-gray-300"
+                           readOnly
                         />
                         <span>Enable Notifications</span>
                      </label>
@@ -154,8 +148,10 @@ export default function ProfilePage() {
                <button className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg font-medium transition duration-200">
                   Save Changes
                </button>
-               <button className="w-full bg-red-500 hover:bg-red-600 text-white py-3 rounded-lg font-medium transition duration-200">
-                  Delete Account
+               <button
+                  className="w-full bg-red-500 hover:bg-red-600 text-white py-3 rounded-lg font-medium transition duration-200"
+                  onClick={logout}
+                  >Logout
                </button>
             </div>
          </div>
