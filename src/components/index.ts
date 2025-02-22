@@ -1,2 +1,3 @@
 import PasswordInput from "./PasswordInput";
-export { PasswordInput };
+import GoogleMapView from "./GoogleMapView";
+export { PasswordInput, GoogleMapView };
