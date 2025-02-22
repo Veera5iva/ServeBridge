@@ -54,16 +54,6 @@ export default function ProfilePage() {
                <h1 className="text-4xl font-bold text-gray-900">Profile</h1>
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex justify-center gap-4 mb-8">
-               <button
-                  className="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-6 rounded-lg transition duration-200"
-                  onClick={logout}
-               >
-                  Logout
-               </button>
-            </div>
-
             {/* Main Content Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 ">
                {/* Left Column - Basic Info */}
@@ -158,8 +148,10 @@ export default function ProfilePage() {
                <button className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg font-medium transition duration-200">
                   Save Changes
                </button>
-               <button className="w-full bg-red-500 hover:bg-red-600 text-white py-3 rounded-lg font-medium transition duration-200">
-                  Delete Account
+               <button
+                  className="w-full bg-red-500 hover:bg-red-600 text-white py-3 rounded-lg font-medium transition duration-200"
+                  onClick={logout}
+                  >Logout
                </button>
             </div>
          </div>
