@@ -6,17 +6,17 @@ import { getDataFromToken } from "@/helpers/getDataFromToken";
 
 connect();
 
-export async function POST(request: NextRequest) {
+export async function PATCH(request: NextRequest) {
     try {
-        const userId = getDataFromToken(request);
+        const consumer = getDataFromToken(request);
+        const consumerId = consumer?.id;
+        
         const reqBody = await request.json();
-        const { location } = reqBody;
+        const { lat, lng } = reqBody;
 
         // Update user with new location
         const user = await Consumer.findByIdAndUpdate(
-            userId,
-            { location: location },
-            { new: true }
+            consumerId, {"location.coordinates": [lat, lng]}, { new: true }
         );
 
         return NextResponse.json({
